@@ -743,6 +743,259 @@ $("flightForm").addEventListener("submit",async event=>{
   }
 });
 
+// ========================================
+// PASSENGER CHECK-IN SYSTEM
+// ========================================
+
+let selectedSeat = "";
+let currentPassengers = [];
+let selectedPassengerFlight = null;
+
+function populatePassengerFlights() {
+  const select = $("passengerFlight");
+  const previous = select.value;
+
+  select.innerHTML = '<option value="">Select a flight</option>';
+
+  flights.forEach(f => {
+    const option = document.createElement("option");
+    option.value = f.id;
+    option.textContent =
+      `${f.flightNumber} — ${f.departure} to ${f.destination}`;
+    select.appendChild(option);
+  });
+
+  if (flights.some(f => f.id === previous)) {
+    select.value = previous;
+  }
+}
+
+async function loadPassengers() {
+  const flightId = $("passengerFlight").value;
+  selectedSeat = "";
+  $("selectedSeatText").textContent = "No seat selected.";
+  $("boardingPass").classList.add("hidden");
+
+  if (!flightId) {
+    $("seatMap").innerHTML =
+      '<p class="muted">Select a flight to see available seats.</p>';
+    $("passengerList").innerHTML =
+      '<tr><td colspan="4" class="empty">Select a flight first.</td></tr>';
+    $("passengerFlightInfo").textContent = "";
+    return;
+  }
+
+  selectedPassengerFlight = flights.find(f => f.id === flightId);
+
+  if (!selectedPassengerFlight) return;
+
+  const f = selectedPassengerFlight;
+
+  $("passengerFlightInfo").textContent =
+    `${f.airline} | ${f.flightNumber} | ${f.departure} → ${f.destination}`;
+
+  try {
+    const passengerQuery = query(
+      collection(db, "workspaces", "main", "passengers"),
+      where("flightId", "==", flightId)
+    );
+
+    const snapshot = await getDocs(passengerQuery);
+    currentPassengers = snapshot.docs.map(d => ({
+      id: d.id,
+      ...d.data()
+    }));
+
+    renderSeatMap();
+    renderPassengerList();
+  } catch (error) {
+    message("passengerMessage", "Could not load passengers: " + error.message);
+  }
+}
+
+function renderSeatMap() {
+  const map = $("seatMap");
+  map.innerHTML = "";
+
+  const columns = ["A", "B", "C", "", "D", "E", "F"];
+
+  for (let row = 1; row <= 20; row++) {
+    columns.forEach(column => {
+      if (!column) {
+        const aisle = document.createElement("div");
+        aisle.className = "aisle";
+        map.appendChild(aisle);
+        return;
+      }
+
+      const seat = column + row;
+      const occupied = currentPassengers.some(p => p.seat === seat);
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = seat;
+      button.className = "seat";
+
+      if (occupied) {
+        button.classList.add("occupied");
+        button.disabled = true;
+        button.title = "Seat occupied";
+      } else if (selectedSeat === seat) {
+        button.classList.add("selected");
+      }
+
+      button.addEventListener("click", () => {
+        selectedSeat = seat;
+        $("selectedSeatText").textContent = "Selected seat: " + seat;
+        renderSeatMap();
+      });
+
+      map.appendChild(button);
+    });
+  }
+}
+
+function renderPassengerList() {
+  const body = $("passengerList");
+
+  if (!currentPassengers.length) {
+    body.innerHTML =
+      '<tr><td colspan="4" class="empty">No passengers registered for this flight.</td></tr>';
+    return;
+  }
+
+  body.innerHTML = currentPassengers.map(p => `
+    <tr>
+      <td>${escapeHTML(p.name)}</td>
+      <td>${escapeHTML(p.seat)}</td>
+      <td><span class="success">Checked in</span></td>
+      <td>
+        <button class="secondary" type="button"
+          data-boarding-pass="${escapeHTML(p.id)}">
+          View Pass
+        </button>
+      </td>
+    </tr>
+  `).join("");
+
+  body.querySelectorAll("[data-boarding-pass]").forEach(button => {
+    button.addEventListener("click", () => {
+      const passenger = currentPassengers.find(
+        p => p.id === button.dataset.boardingPass
+      );
+      if (passenger) showBoardingPass(passenger);
+    });
+  });
+}
+
+$("passengerFlight").addEventListener("change", loadPassengers);
+
+$("passengerForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const flight = selectedPassengerFlight;
+
+  if (!flight) {
+    message("passengerMessage", "Please select a flight first.");
+    return;
+  }
+
+  if (!selectedSeat) {
+    message("passengerMessage", "Please select a seat.");
+    return;
+  }
+
+  if (currentPassengers.some(p => p.seat === selectedSeat)) {
+    message("passengerMessage", "That seat is already occupied.");
+    await loadPassengers();
+    return;
+  }
+
+  const button = $("registerPassengerButton");
+  button.disabled = true;
+  button.textContent = "Registering...";
+
+  const passenger = {
+    name: $("passengerName").value.trim(),
+    phone: $("passengerPhone").value.trim(),
+    email: $("passengerEmail").value.trim(),
+    seat: selectedSeat,
+    flightId: flight.id,
+    flightNumber: flight.flightNumber,
+    airline: flight.airline,
+    departure: flight.departure,
+    destination: flight.destination,
+    checkedIn: true,
+    createdBy: currentUser.uid,
+    createdAt: serverTimestamp()
+  };
+
+  try {
+    const result = await addDoc(
+      collection(db, "workspaces", "main", "passengers"),
+      passenger
+    );
+
+    const savedPassenger = {
+      id: result.id,
+      ...passenger
+    };
+
+    message("passengerMessage", "Passenger registered successfully!", "success");
+
+    $("passengerForm").reset();
+    selectedSeat = "";
+
+    await loadPassengers();
+    showBoardingPass(savedPassenger);
+
+  } catch (error) {
+    message("passengerMessage", "Registration failed: " + error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Register Passenger";
+  }
+});
+
+function showBoardingPass(passenger) {
+  $("bpName").textContent = passenger.name;
+  $("bpFlight").textContent = passenger.flightNumber;
+  $("bpFrom").textContent = passenger.departure;
+  $("bpTo").textContent = passenger.destination;
+  $("bpSeat").textContent = passenger.seat;
+
+  const qr = $("boardingQR");
+  qr.innerHTML = "";
+
+  if (typeof QRCode === "undefined") {
+    qr.textContent = "QR library unavailable. Check your internet connection.";
+  } else {
+    const qrData = JSON.stringify({
+      bookingId: passenger.id,
+      flight: passenger.flightNumber,
+      seat: passenger.seat
+    });
+
+    new QRCode(qr, {
+      text: qrData,
+      width: 130,
+      height: 130
+    });
+  }
+
+  $("boardingPass").classList.remove("hidden");
+  $("boardingPass").scrollIntoView({ behavior: "smooth" });
+}
+
+window.addEventListener("afterprint", () => {
+  document.body.classList.remove("print-pass");
+});
+
+// Print only the boarding pass.
+$("boardingPass").querySelector("button").addEventListener("click", () => {
+  document.body.classList.add("print-pass");
+});
+
 onAuthStateChanged(auth,async user=>{
   if(!user){
     currentUser=null;
