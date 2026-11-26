@@ -4,492 +4,318 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#071521">
+  <meta name="theme-color" content="#07111f">
   <title>Infinite Flight Companion</title>
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
-      background: #071521;
-      color: #ffffff;
-      min-height: 100vh;
+      background: #07111f;
+      color: #f4f6fa;
     }
 
-    .sidebar {
-      width: 250px;
-      height: 100vh;
-      position: fixed;
-      left: 0;
-      top: 0;
-      background: #0d202e;
-      padding: 28px 18px;
-      border-right: 1px solid #203544;
+    button, input { font: inherit; }
+
+    .container {
+      width: min(440px, 92%);
+      margin: 70px auto;
     }
 
-    .logo {
-      font-size: 19px;
-      font-weight: bold;
-      margin-bottom: 45px;
-      color: #e4b65b;
+    .panel {
+      background: #101e30;
+      border: 1px solid #26364a;
+      border-radius: 16px;
+      padding: 25px;
     }
 
-    .logo span {
-      display: block;
-      font-size: 10px;
-      color: #9aabb6;
-      letter-spacing: 3px;
-      margin-top: 7px;
-    }
+    h1 { font-size: 25px; margin-top: 0; }
+    h2 { font-size: 20px; }
 
-    .nav-title {
-      color: #708593;
-      font-size: 10px;
-      letter-spacing: 2px;
-      margin: 25px 12px 12px;
-    }
+    .muted { color: #a8b6c9; line-height: 1.6; }
 
-    .nav-item {
-      padding: 13px 14px;
-      margin: 5px 0;
+    input {
+      width: 100%;
+      padding: 14px;
+      margin: 8px 0;
+      border: 1px solid #35465c;
       border-radius: 8px;
-      color: #aabac5;
-      cursor: pointer;
-      font-size: 14px;
-      transition: .2s;
-    }
-
-    .nav-item:hover,
-    .nav-item.active {
-      background: #183a48;
-      color: #e4b65b;
-    }
-
-    main {
-      margin-left: 250px;
-      padding: 35px;
-    }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 38px;
-      gap: 15px;
-    }
-
-    .topbar h1 {
-      font-size: 26px;
-      font-weight: 500;
-    }
-
-    .connection {
-      background: #172e38;
-      border: 1px solid #31504e;
-      padding: 10px 15px;
-      border-radius: 30px;
-      color: #b5c9bd;
-      font-size: 12px;
-    }
-
-    .welcome {
-      margin-bottom: 30px;
-    }
-
-    .welcome h2 {
-      font-size: 30px;
-      margin-bottom: 10px;
-    }
-
-    .welcome p {
-      color: #8da0ad;
-      font-size: 14px;
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-      margin-bottom: 28px;
-    }
-
-    .card {
-      background: #102431;
-      border: 1px solid #213947;
-      border-radius: 13px;
-      padding: 22px;
-    }
-
-    .card-label {
-      font-size: 12px;
-      color: #8da0ad;
-      margin-bottom: 15px;
-    }
-
-    .card-value {
-      font-size: 23px;
-      color: #e4b65b;
-      font-weight: bold;
-    }
-
-    .section-title {
-      font-size: 18px;
-      margin-bottom: 18px;
-    }
-
-    .flight-card {
-      background: linear-gradient(120deg, #143746, #102431);
-      border: 1px solid #31505a;
-      border-radius: 15px;
-      padding: 28px;
-      margin-bottom: 25px;
-    }
-
-    .flight-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-      gap: 10px;
-    }
-
-    .flight-number {
-      color: #e4b65b;
-      font-size: 13px;
-    }
-
-    .status {
-      font-size: 11px;
-      background: #294b45;
-      color: #a9d7bc;
-      padding: 7px 12px;
-      border-radius: 20px;
-    }
-
-    .route {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .airport-code {
-      font-size: 36px;
-      font-weight: bold;
-    }
-
-    .airport-name {
-      color: #9aabb6;
-      font-size: 12px;
-      margin-top: 7px;
-    }
-
-    .route-line {
-      flex: 1;
-      text-align: center;
-      color: #e4b65b;
-      font-size: 12px;
-    }
-
-    .route-line span {
-      display: block;
-      font-size: 25px;
-      margin: 5px 0;
-    }
-
-    .actions {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-    }
-
-    .action-card {
-      cursor: pointer;
-      transition: .2s;
-    }
-
-    .action-card:hover {
-      border-color: #d9aa50;
-      transform: translateY(-3px);
-    }
-
-    .action-icon {
-      font-size: 25px;
-      margin-bottom: 16px;
-    }
-
-    .action-card h3 {
-      font-size: 14px;
-      margin-bottom: 8px;
-    }
-
-    .action-card p {
-      color: #8da0ad;
-      font-size: 12px;
-      line-height: 1.6;
-    }
-
-    .page {
-      display: none;
-    }
-
-    .page.active {
-      display: block;
-    }
-
-    .placeholder {
-      margin-top: 20px;
-      color: #9aabb6;
-      line-height: 1.8;
+      background: #091625;
+      color: white;
     }
 
     button {
-      background: #d9aa50;
-      color: #071521;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 7px;
+      padding: 13px 18px;
+      border: 0;
+      border-radius: 8px;
+      background: #d7a747;
+      color: #111827;
       font-weight: bold;
       cursor: pointer;
-      margin-top: 20px;
     }
 
-    @media(max-width: 850px) {
-      .sidebar {
-        width: 70px;
-        padding: 20px 8px;
-      }
+    button:disabled { opacity: .6; cursor: wait; }
 
-      .logo {
-        font-size: 10px;
-        text-align: center;
-      }
+    .primary { width: 100%; margin-top: 12px; }
 
-      .logo span,
-      .nav-title,
-      .nav-item span {
-        display: none;
-      }
+    .error { color: #ff8585; }
+    .success { color: #79dca5; }
 
-      .nav-item {
-        text-align: center;
-        padding: 14px 5px;
-        font-size: 19px;
-      }
+    .hidden { display: none !important; }
 
-      main {
-        margin-left: 70px;
-        padding: 22px;
-      }
-
-      .stats,
-      .actions {
-        grid-template-columns: 1fr;
-      }
+    header {
+      padding: 18px 5%;
+      border-bottom: 1px solid #26364a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
     }
 
-    @media(max-width: 500px) {
-      main {
-        padding: 16px;
-      }
+    header h2 { margin: 0; font-size: 18px; }
 
-      .topbar h1 {
-        font-size: 19px;
-      }
-
-      .welcome h2 {
-        font-size: 23px;
-      }
-
-      .route {
-        flex-wrap: wrap;
-      }
-
-      .airport-code {
-        font-size: 27px;
-      }
+    main {
+      width: min(1100px, 92%);
+      margin: 35px auto;
     }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 25px;
+    }
+
+    .feature {
+      background: #101e30;
+      border: 1px solid #26364a;
+      border-radius: 12px;
+      padding: 22px;
+    }
+
+    .feature h3 { margin-top: 0; color: #e3b653; }
+
+    #message { min-height: 22px; margin-top: 12px; }
   </style>
 </head>
 
 <body>
 
-  <aside class="sidebar">
-    <div class="logo">
-      ✈ INFINITE FLIGHT
-      <span>COMPANION</span>
+  <section id="loginPage" class="container">
+    <div class="panel">
+      <h1>✈ Infinite Flight Companion</h1>
+      <p class="muted">Sign in to access your flight companion workspace.</p>
+
+      <form id="loginForm">
+        <input
+          id="email"
+          type="email"
+          placeholder="Email address"
+          autocomplete="username"
+          required
+        >
+
+        <input
+          id="password"
+          type="password"
+          placeholder="Password"
+          autocomplete="current-password"
+          required
+        >
+
+        <button class="primary" id="loginButton" type="submit">
+          Sign In
+        </button>
+      </form>
+
+      <p id="message" aria-live="polite"></p>
+      <button id="resetButton" type="button">
+        Reset Password
+      </button>
     </div>
+  </section>
 
-    <div class="nav-title">MAIN MENU</div>
+  <section id="dashboardPage" class="hidden">
+    <header>
+      <h2>✈ Infinite Flight Companion</h2>
+      <button id="logoutButton">Logout</button>
+    </header>
 
-    <div class="nav-item active" onclick="showPage('dashboard',this)">⌂ <span>Dashboard</span></div>
-    <div class="nav-item" onclick="showPage('setup',this)">✈ <span>Flight Setup</span></div>
-    <div class="nav-item" onclick="showPage('checkin',this)">▣ <span>Check-in</span></div>
-    <div class="nav-item" onclick="showPage('boarding',this)">♙ <span>Boarding</span></div>
-    <div class="nav-item" onclick="showPage('cabin',this)">▤ <span>Cabin Experience</span></div>
+    <main>
+      <h1>Welcome to your flight workspace</h1>
+      <p class="muted" id="accountInfo"></p>
 
-    <div class="nav-title">FLIGHT</div>
-
-    <div class="nav-item" onclick="showPage('tracker',this)">◎ <span>Live Tracker</span></div>
-    <div class="nav-item" onclick="showPage('audio',this)">♫ <span>Audio Centre</span></div>
-    <div class="nav-item" onclick="showPage('history',this)">◷ <span>Flight History</span></div>
-  </aside>
-
-  <main>
-
-    <div class="topbar">
-      <h1 id="pageTitle">Dashboard</h1>
-      <div class="connection">● Simulator Not Connected</div>
-    </div>
-
-    <section id="dashboard" class="page active">
-      <div class="welcome">
-        <h2>Welcome Aboard</h2>
-        <p>Your personal airline passenger experience starts here.</p>
-      </div>
-
-      <div class="stats">
-        <div class="card">
-          <div class="card-label">SIMULATOR STATUS</div>
-          <div class="card-value">Offline</div>
-        </div>
-        <div class="card">
-          <div class="card-label">CURRENT FLIGHT</div>
-          <div class="card-value">Not Set</div>
-        </div>
-        <div class="card">
-          <div class="card-label">FLIGHT PHASE</div>
-          <div class="card-value">Ground</div>
-        </div>
-      </div>
-
-      <h3 class="section-title">Flight Overview</h3>
-
-      <div class="flight-card">
-        <div class="flight-header">
-          <div class="flight-number">YOUR NEXT JOURNEY</div>
-          <div class="status">Awaiting Setup</div>
+      <div class="grid">
+        <div class="feature">
+          <h3>Flight Setup</h3>
+          <p class="muted">Prepare your airline, flight number, route and aircraft.</p>
         </div>
 
-        <div class="route">
-          <div>
-            <div class="airport-code">---</div>
-            <div class="airport-name">Departure</div>
-          </div>
-
-          <div class="route-line">
-            ✈
-            <span>━━━━━━━━</span>
-            ROUTE
-          </div>
-
-          <div>
-            <div class="airport-code">---</div>
-            <div class="airport-name">Destination</div>
-          </div>
-        </div>
-      </div>
-
-      <h3 class="section-title">Quick Access</h3>
-
-      <div class="actions">
-        <div class="card action-card" onclick="showPage('setup')">
-          <div class="action-icon">✈</div>
-          <h3>Set Up Flight</h3>
-          <p>Choose your airline, aircraft and destination.</p>
-        </div>
-
-        <div class="card action-card" onclick="showPage('checkin')">
-          <div class="action-icon">▣</div>
+        <div class="feature">
           <h3>Passenger Check-in</h3>
-          <p>Register passengers and prepare boarding passes.</p>
+          <p class="muted">Prepare passenger check-in and boarding passes.</p>
         </div>
 
-        <div class="card action-card" onclick="showPage('tracker')">
-          <div class="action-icon">◎</div>
-          <h3>Flight Tracker</h3>
-          <p>View your live aircraft position and flight progress.</p>
+        <div class="feature">
+          <h3>Boarding</h3>
+          <p class="muted">Manage boarding groups and announcements.</p>
+        </div>
+
+        <div class="feature">
+          <h3>Cabin Experience</h3>
+          <p class="muted">Manage cabin announcements and audio.</p>
+        </div>
+
+        <div class="feature">
+          <h3>Live Tracker</h3>
+          <p class="muted">Connect to Infinite Flight telemetry.</p>
+        </div>
+
+        <div class="feature">
+          <h3>Audio Centre</h3>
+          <p class="muted">Manage airport and aircraft announcements.</p>
         </div>
       </div>
-    </section>
+    </main>
+  </section>
 
-    <section id="setup" class="page">
-      <h2>Flight Setup</h2>
-      <p class="placeholder">Configure your airline, flight number, departure airport, destination and aircraft here.</p>
-    </section>
+  <script type="module">
+    import { initializeApp } from
+      "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
 
-    <section id="checkin" class="page">
-      <h2>Passenger Check-in</h2>
-      <p class="placeholder">Passenger registration, seat selection and boarding passes will be available here.</p>
-    </section>
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      onAuthStateChanged,
+      signOut,
+      sendPasswordResetEmail
+    } from
+      "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
 
-    <section id="boarding" class="page">
-      <h2>Airport Boarding</h2>
-      <p class="placeholder">Priority boarding, boarding groups, final call and gate closing.</p>
-    </section>
+    import {
+      getFirestore,
+      doc,
+      getDoc
+    } from
+      "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
 
-    <section id="cabin" class="page">
-      <h2>Aircraft Cabin</h2>
-      <p class="placeholder">Cabin crew announcements, captain announcements and cabin relaxation music.</p>
-    </section>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDQgKie9EHcjG81IWxez_vxPue4zfFnZbk",
+      authDomain: "infinite-flight-companion.firebaseapp.com",
+      projectId: "infinite-flight-companion",
+      storageBucket: "infinite-flight-companion.firebasestorage.app",
+      messagingSenderId: "208265827432",
+      appId: "1:208265827432:web:72d8d6d7e2ce38ec1017dd"
+    };
 
-    <section id="tracker" class="page">
-      <h2>Live Flight Tracker</h2>
-      <p class="placeholder">Your aircraft's real-time position and satellite map will appear here.</p>
-    </section>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    <section id="audio" class="page">
-      <h2>Audio Centre</h2>
-      <p class="placeholder">Manage airport announcements, cabin announcements, radio effects and background music.</p>
-    </section>
+    const loginPage = document.getElementById("loginPage");
+    const dashboardPage = document.getElementById("dashboardPage");
+    const loginForm = document.getElementById("loginForm");
+    const loginButton = document.getElementById("loginButton");
+    const message = document.getElementById("message");
 
-    <section id="history" class="page">
-      <h2>Flight History</h2>
-      <p class="placeholder">Your completed flights will appear here.</p>
-    </section>
+    function showMessage(text, type = "error") {
+      message.textContent = text;
+      message.className = type;
+    }
 
-  </main>
+    async function checkWorkspace(user) {
+      const memberRef = doc(
+        db, "workspaces", "main", "members", user.uid
+      );
 
-  <script>
-    function showPage(pageId, element) {
-      document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
-      });
+      const memberSnapshot = await getDoc(memberRef);
 
-      document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.remove('active');
-      });
-
-      document.getElementById(pageId).classList.add('active');
-
-      if (element) {
-        element.classList.add('active');
-      } else {
-        document.querySelectorAll('.nav-item').forEach(item => {
-          if (item.getAttribute('onclick')?.includes("'" + pageId + "'")) {
-            item.classList.add('active');
-          }
-        });
+      if (!memberSnapshot.exists()) {
+        await signOut(auth);
+        throw new Error(
+          "Your account has not been invited to this workspace."
+        );
       }
 
-      const titles = {
-        dashboard: 'Dashboard',
-        setup: 'Flight Setup',
-        checkin: 'Passenger Check-in',
-        boarding: 'Airport Boarding',
-        cabin: 'Aircraft Cabin',
-        tracker: 'Live Flight Tracker',
-        audio: 'Audio Centre',
-        history: 'Flight History'
-      };
+      const member = memberSnapshot.data();
 
-      document.getElementById('pageTitle').textContent = titles[pageId];
+      const workspaceRef = doc(db, "workspaces", "main");
+      const workspaceSnapshot = await getDoc(workspaceRef);
+
+      if (!workspaceSnapshot.exists()) {
+        throw new Error("Workspace not found. Contact the owner.");
+      }
+
+      if (member.role !== "owner" && member.role !== "member") {
+        throw new Error("Your account has an invalid workspace role.");
+      }
+
+      loginPage.classList.add("hidden");
+      dashboardPage.classList.remove("hidden");
+
+      document.getElementById("accountInfo").textContent =
+        `${user.email} • ${member.role.toUpperCase()}`;
     }
+
+    loginForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      loginButton.disabled = true;
+      loginButton.textContent = "Signing in...";
+      showMessage("");
+
+      try {
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (error) {
+        showMessage(error.message);
+      } finally {
+        loginButton.disabled = false;
+        loginButton.textContent = "Sign In";
+      }
+    });
+
+    document.getElementById("resetButton").addEventListener("click",
+      async () => {
+        const email = document.getElementById("email").value.trim();
+
+        if (!email) {
+          showMessage("Enter your email address first.");
+          return;
+        }
+
+        try {
+          await sendPasswordResetEmail(auth, email);
+          showMessage("Password reset email sent.", "success");
+        } catch (error) {
+          showMessage(error.message);
+        }
+      }
+    );
+
+    document.getElementById("logoutButton").addEventListener("click",
+      () => signOut(auth)
+    );
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        dashboardPage.classList.add("hidden");
+        loginPage.classList.remove("hidden");
+        return;
+      }
+
+      try {
+        await checkWorkspace(user);
+      } catch (error) {
+        dashboardPage.classList.add("hidden");
+        loginPage.classList.remove("hidden");
+        showMessage(error.message);
+      }
+    });
   </script>
 
 </body>
