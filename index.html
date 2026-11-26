@@ -3,1019 +3,163 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#091321">
 <title>Infinite Flight Companion</title>
-
 <style>
-:root {
-  --bg:#091321;
-  --sidebar:#0d1a2a;
-  --panel:#122237;
-  --panel2:#182b42;
-  --border:#263b52;
-  --gold:#d9ad58;
-  --text:#f3f5f8;
-  --muted:#9aabc0;
-  --green:#45c58a;
-  --red:#ed7777;
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
-button,input,select{font:inherit}
-button{cursor:pointer}
-.hidden{display:none!important}
-#loginPage{max-width:420px;margin:70px auto;padding:20px}
-.login-card{background:var(--panel);padding:30px;border:1px solid var(--border);border-radius:16px}
-input,select{
-  width:100%;padding:13px;margin:7px 0 15px;
-  background:#091625;color:white;border:1px solid var(--border);
-  border-radius:8px;outline:none
-}
-input:focus,select:focus{border-color:var(--gold)}
-label{font-size:13px;color:var(--muted)}
-button.primary{background:var(--gold);color:#101827;border:0;border-radius:8px;padding:13px 18px;font-weight:bold}
-button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:11px 15px}
-button:disabled{opacity:.5;cursor:not-allowed}
-.full{width:100%}
-.error{color:var(--red);font-size:13px}
-.success{color:var(--green);font-size:13px}
-.muted{color:var(--muted)}
-#app{min-height:100vh}
-.sidebar{
-  position:fixed;left:0;top:0;bottom:0;width:245px;
-  background:var(--sidebar);border-right:1px solid var(--border);
-  padding:22px 14px;display:flex;flex-direction:column;z-index:10;
-  transition:transform .25s
-}
-.brand{display:flex;align-items:center;gap:12px;padding:5px 10px 24px;border-bottom:1px solid var(--border)}
-.brand-icon{font-size:28px;color:var(--gold)}
-.brand strong{font-size:14px;line-height:1.4}
-.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:1px}
-.nav-label{font-size:10px;letter-spacing:1.5px;color:#73869d;padding:22px 12px 9px}
-.nav-button{
-  display:flex;align-items:center;gap:13px;width:100%;
-  padding:12px;border:0;background:transparent;color:#aebdd0;
-  border-radius:8px;text-align:left;margin:2px 0;font-size:14px
-}
-.nav-button:hover{background:var(--panel2);color:white}
-.nav-button.active{background:#25364b;color:var(--gold);font-weight:bold}
-.nav-icon{width:22px;text-align:center;font-size:17px}
-.sidebar-bottom{margin-top:auto;border-top:1px solid var(--border);padding-top:15px}
-.account{padding:10px;color:var(--muted);font-size:12px;overflow-wrap:anywhere}
-.main{margin-left:245px;min-height:100vh}
-.topbar{
-  height:70px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 30px;background:#0b1726;position:sticky;top:0;z-index:5
-}
-.topbar-title{font-size:17px;font-weight:bold}
-.topbar-right{display:flex;align-items:center;gap:12px}
-.status{font-size:12px;color:var(--green)}
-.menu-toggle{display:none;background:transparent;color:white;border:0;font-size:24px}
-.content{padding:30px;max-width:1450px;margin:auto}
-.page{display:none}
-.page.active{display:block}
-.page-heading{margin-bottom:25px}
-.page-heading h1{font-size:27px;margin:0 0 8px}
-.page-heading p{color:var(--muted);margin:0;font-size:14px}
-.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
-.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px}
-.stat-label{font-size:12px;color:var(--muted)}
-.stat-value{font-size:28px;font-weight:bold;margin:12px 0 5px}
-.stat-icon{font-size:22px;color:var(--gold);float:right}
-.section-title{font-size:17px;margin:28px 0 14px}
-.quick-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
-.quick-action{
-  background:var(--panel);border:1px solid var(--border);
-  border-radius:12px;padding:20px;color:white;text-align:left;
-  transition:.2s
-}
-.quick-action:hover{border-color:var(--gold);transform:translateY(-2px)}
-.quick-action span{font-size:24px;display:block;margin-bottom:12px}
-.quick-action strong{display:block;margin-bottom:6px}
-.quick-action small{color:var(--muted);line-height:1.5}
-.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 18px}
-.form-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-.table-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:500px}
-th,td{text-align:left;padding:13px;border-bottom:1px solid var(--border);font-size:13px}
-th{color:var(--muted);font-weight:normal}
-.empty{text-align:center;color:var(--muted);padding:35px 10px}
-.notice{padding:14px;background:#192b40;border:1px solid var(--border);border-radius:9px;color:var(--muted);font-size:13px;line-height:1.6}
-.page-message{font-size:13px;margin-top:12px}
-.mobile-overlay{display:none}
-@media(max-width:1050px){
- .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@media(max-width:700px){
- .sidebar{transform:translateX(-100%)}
- .sidebar.open{transform:translateX(0)}
- .main{margin-left:0}
- .menu-toggle{display:block}
- .topbar{padding:0 15px}
- .content{padding:20px 15px}
- .quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
- .form-grid{grid-template-columns:1fr}
- .mobile-overlay.show{display:block;position:fixed;inset:0;background:#0009;z-index:8}
- .topbar-title{font-size:14px}
-}
-@media(max-width:420px){
- .grid{grid-template-columns:1fr 1fr;gap:9px}
- .card{padding:14px}
- .stat-value{font-size:23px}
- .quick-grid{grid-template-columns:1fr}
-}
-  
-.seat-legend {
-  display:flex;
-  flex-wrap:wrap;
-  gap:18px;
-  margin:18px 0;
-  font-size:12px;
-  color:var(--muted);
-}
-.seat-legend span {
-  display:flex;
-  align-items:center;
-  gap:7px;
-}
-.seat-dot {
-  display:inline-block;
-  width:12px;
-  height:12px;
-  border-radius:3px;
-  background:#263b52;
-}
-.seat-dot.available {background:#304b68}
-.seat-dot.selected {background:var(--gold)}
-.seat-dot.occupied {background:#a94d53}
-
-.seat-map {
-  display:grid;
-  grid-template-columns:repeat(7, minmax(30px, 44px));
-  gap:8px;
-  justify-content:center;
-  padding:20px 5px;
-  margin-top:12px;
-  background:#0b1929;
-  border:1px solid var(--border);
-  border-radius:12px;
-  overflow-x:auto;
-}
-.seat {
-  min-height:38px;
-  border:1px solid #40556d;
-  background:#20364d;
-  color:white;
-  border-radius:7px;
-  font-size:12px;
-}
-.seat:hover:not(:disabled) {border-color:var(--gold)}
-.seat.selected {background:var(--gold);color:#101827;border-color:var(--gold)}
-.seat.occupied {background:#753b43;color:#fff;border-color:#753b43}
-.seat:disabled {cursor:not-allowed;opacity:.8}
-.aisle {width:12px}
-.gold-text {color:var(--gold)}
-
-.boarding-pass {
-  max-width:650px;
-  margin:22px auto;
-  padding:22px;
-  background:#f7f7f3;
-  color:#172437;
-  border-radius:14px;
-}
-.boarding-pass-header {
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  border-bottom:2px solid #d9ad58;
-  padding-bottom:15px;
-  font-size:13px;
-}
-.boarding-pass-body {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:20px;
-  padding:15px 0;
-}
-.boarding-pass-body h2,
-.boarding-pass-body h3 {margin:5px 0 13px;color:#172437}
-.boarding-pass-body .muted {color:#64748b;font-size:10px;margin-bottom:3px}
-.boarding-pass-footer {
-  border-top:1px dashed #aab3bf;
-  padding-top:14px;
-  font-size:12px;
-}
-#boardingQR img {max-width:130px}
-.boarding-pass button {margin-top:12px}
-
-@media(max-width:450px) {
-  .boarding-pass-body {flex-direction:column;align-items:flex-start}
-}
-
-@media print {
-  body.print-pass * {visibility:hidden!important}
-  body.print-pass #boardingPass,
-  body.print-pass #boardingPass * {visibility:visible!important}
-  body.print-pass #boardingPass {
-    display:block!important;
-    position:absolute;
-    left:0;
-    top:0;
-    width:100%;
-    max-width:none;
-    margin:0;
-    box-shadow:none;
-  }
-  body.print-pass #boardingPass button {display:none!important}
-}
-
+:root{--bg:#091321;--side:#0d1a2a;--panel:#122237;--panel2:#182b42;--line:#263b52;--gold:#d9ad58;--text:#f3f5f8;--muted:#9aabc0;--green:#45c58a;--red:#ed7777}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px Arial,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}
+.hidden{display:none!important}.muted{color:var(--muted)}.gold{color:var(--gold)}.ok{color:var(--green)}.err{color:var(--red)}
+input,select,textarea{width:100%;padding:11px 12px;margin:6px 0 13px;background:#091625;color:#fff;border:1px solid var(--line);border-radius:8px}label{display:block;color:var(--muted);font-size:12px}
+button.primary{background:var(--gold);color:#101827;border:0;border-radius:8px;padding:11px 16px;font-weight:700}button.secondary,.nav{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:10px 13px}button.danger{background:#552e38;color:#fff;border:1px solid #85424f;border-radius:8px;padding:10px 13px}
+#loginPage{max-width:420px;margin:8vh auto;padding:18px}.login,.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}.login{padding:28px}.full{width:100%}
+#app{min-height:100vh}.sidebar{position:fixed;inset:0 auto 0 0;width:245px;background:var(--side);border-right:1px solid var(--line);padding:18px 12px;overflow:auto;z-index:10}.brand{display:flex;gap:10px;align-items:center;padding:8px 10px 24px}.brand-icon{font-size:27px;color:var(--gold)}.brand small{display:block;color:var(--muted);font-size:9px;letter-spacing:1px;margin-top:5px}.nav-label{font-size:10px;color:#72869e;letter-spacing:1.4px;padding:14px 10px 7px}.nav{display:block;width:100%;text-align:left;margin:4px 0;background:transparent;border-color:transparent}.nav.active,.nav:hover{background:var(--panel2);border-color:var(--line);color:var(--gold)}.side-bottom{margin-top:28px;border-top:1px solid var(--line);padding-top:14px}
+.main{margin-left:245px;min-height:100vh}.topbar{height:64px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:#0b1827;position:sticky;top:0;z-index:5}.topbar strong{font-size:16px}.content{padding:24px;max-width:1500px;margin:auto}.page{display:none}.page.active{display:block}.heading{margin-bottom:18px}.heading h1{margin:0 0 7px;font-size:25px}.heading p{color:var(--muted);margin:0}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}.stat{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:17px}.stat small{color:var(--muted)}.stat b{display:block;font-size:25px;margin:8px 0}.section-title{margin:24px 0 12px;font-size:17px}.quick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.quick button{text-align:left;padding:16px;background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:12px}.quick b{display:block;margin-bottom:6px}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.row>*{flex:1}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}.card{margin-bottom:15px}.card h2,.card h3{margin-top:0}.notice{background:#152b42;border:1px solid #304a66;padding:13px;border-radius:9px;color:#c5d3e2;margin:12px 0}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:520px}th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-size:11px;text-transform:uppercase}td{font-size:13px}.message{min-height:18px;margin:8px 0}.seatmap{display:grid;grid-template-columns:repeat(7,minmax(32px,44px));gap:7px;justify-content:center;background:#0b1929;padding:16px;border-radius:10px;overflow:auto}.seat{background:#20364d;color:white;border:1px solid #40556d;border-radius:6px;padding:8px 2px;font-size:11px}.seat.selected{background:var(--gold);color:#111}.seat.occupied{background:#753b43}.aisle{min-width:12px}.pass{background:#f7f7f3;color:#172437;padding:20px;border-radius:12px;max-width:620px;margin-top:15px}.pass h2,.pass h3{color:#172437}.pass button{margin-top:10px}.audioitem{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.audioitem span{flex:1}.pill{font-size:11px;color:var(--gold);border:1px solid #675638;border-radius:20px;padding:4px 8px}.phase{font-size:20px;color:var(--gold);font-weight:bold}.small{font-size:12px}.menuToggle{display:none}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.quick{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.sidebar{transform:translateX(-100%);transition:.2s}.sidebar.open{transform:translateX(0)}.main{margin:0}.menuToggle{display:inline-block}.topbar{padding:0 14px}.content{padding:16px}.formgrid{grid-template-columns:1fr}.grid{gap:8px}.stat{padding:12px}.quick{grid-template-columns:1fr 1fr}}
+@media(max-width:420px){.grid{grid-template-columns:1fr 1fr}.topbar strong{font-size:13px}}
+@media print{body.printpass *{visibility:hidden!important}body.printpass #boardingPass,body.printpass #boardingPass *{visibility:visible!important}body.printpass #boardingPass{position:absolute;inset:0;width:100%;max-width:none}body.printpass #boardingPass button{display:none}}
 </style>
 </head>
-
 <body>
-
 <section id="loginPage">
-  <div class="login-card">
-    <h1>✈ Infinite Flight Companion</h1>
-    <p class="muted">Sign in to your flight operations workspace.</p>
-    <form id="loginForm">
-      <label>Email address</label>
-      <input id="email" type="email" required autocomplete="username">
-      <label>Password</label>
-      <input id="password" type="password" required autocomplete="current-password">
-      <button class="primary full" id="loginButton">Sign In</button>
-    </form>
-    <p id="loginMessage" class="page-message"></p>
-    <button class="secondary full" id="resetButton">Forgot password?</button>
-  </div>
+ <div class="login">
+  <h1>✈ Infinite Flight Companion</h1><p class="muted">Sign in to your flight workspace.</p>
+  <form id="loginForm"><label>Email address</label><input id="email" type="email" required autocomplete="username"><label>Password</label><input id="password" type="password" required autocomplete="current-password"><button class="primary full" id="loginButton">Sign In</button></form>
+  <p id="loginMessage" class="message"></p><button class="secondary full" id="resetButton">Forgot password?</button>
+ </div>
 </section>
-
 <div id="app" class="hidden">
-  <div class="mobile-overlay" id="overlay"></div>
-
-  <aside class="sidebar" id="sidebar">
-    <div class="brand">
-      <div class="brand-icon">✈</div>
-      <div><strong>INFINITE FLIGHT<br>COMPANION</strong><small>FLIGHT EXPERIENCE SYSTEM</small></div>
-    </div>
-
-    <div class="nav-label">MAIN MENU</div>
-    <button class="nav-button active" data-page="dashboard"><span class="nav-icon">▦</span>Dashboard</button>
-    <button class="nav-button" data-page="flightSetup"><span class="nav-icon">✈</span>Flight Setup</button>
-    <button class="nav-button" data-page="checkin"><span class="nav-icon">▣</span>Passenger Check-in</button>
-    <button class="nav-button" data-page="boarding"><span class="nav-icon">♧</span>Boarding</button>
-
-    <div class="nav-label">FLIGHT EXPERIENCE</div>
-    <button class="nav-button" data-page="cabin"><span class="nav-icon">◉</span>Cabin Experience</button>
-    <button class="nav-button" data-page="tracker"><span class="nav-icon">⌖</span>Live Tracker</button>
-    <button class="nav-button" data-page="audio"><span class="nav-icon">♫</span>Audio Centre</button>
-
-    <div class="nav-label">MANAGEMENT</div>
-    <button class="nav-button" data-page="history"><span class="nav-icon">◷</span>Flight History</button>
-    <button class="nav-button" data-page="users"><span class="nav-icon">♙</span>User Management</button>
-    <button class="nav-button" data-page="settings"><span class="nav-icon">⚙</span>Settings</button>
-
-    <div class="sidebar-bottom">
-      <div class="account" id="accountEmail">Signed in</div>
-      <button class="nav-button" id="logoutButton"><span class="nav-icon">⇥</span>Sign Out</button>
-    </div>
-  </aside>
-
-  <main class="main">
-    <header class="topbar">
-      <div style="display:flex;align-items:center;gap:13px">
-        <button class="menu-toggle" id="menuToggle">☰</button>
-        <div class="topbar-title" id="topTitle">Dashboard</div>
-      </div>
-      <div class="topbar-right">
-        <span class="status">● Workspace connected</span>
-        <button class="secondary" id="topLogoutButton">Logout ↗</button>
-      </div>
-    </header>
-
-    <div class="content">
-
-      <section class="page active" id="page-dashboard">
-        <div class="page-heading">
-          <h1>Flight Operations Dashboard</h1>
-          <p>Welcome to your Infinite Flight Companion workspace.</p>
-        </div>
-
-        <div class="grid">
-          <div class="card"><span class="stat-icon">✈</span><div class="stat-label">Total Flights</div><div class="stat-value" id="totalFlights">0</div><div class="muted">Saved flights</div></div>
-          <div class="card"><span class="stat-icon">◉</span><div class="stat-label">Active Flight</div><div class="stat-value" id="activeFlight">0</div><div class="muted">Currently selected</div></div>
-          <div class="card"><span class="stat-icon">♙</span><div class="stat-label">Passengers</div><div class="stat-value">—</div><div class="muted">Coming soon</div></div>
-          <div class="card"><span class="stat-icon">♫</span><div class="stat-label">Audio System</div><div class="stat-value">Ready</div><div class="muted">Audio controls coming soon</div></div>
-        </div>
-
-        <h2 class="section-title">Quick Actions</h2>
-        <div class="quick-grid">
-          <button class="quick-action" data-go="flightSetup"><span>✈</span><strong>Create Flight</strong><small>Set airline, route and aircraft details.</small></button>
-          <button class="quick-action" data-go="checkin"><span>▣</span><strong>Passenger Check-in</strong><small>Open the passenger check-in section.</small></button>
-          <button class="quick-action" data-go="boarding"><span>♧</span><strong>Start Boarding</strong><small>Open boarding management.</small></button>
-          <button class="quick-action" data-go="audio"><span>♫</span><strong>Audio Centre</strong><small>Open announcement and sound controls.</small></button>
-          <button class="quick-action" data-go="tracker"><span>⌖</span><strong>Live Tracker</strong><small>Open the simulator tracking section.</small></button>
-          <button class="quick-action" data-go="history"><span>◷</span><strong>Flight History</strong><small>View saved flight records.</small></button>
-        </div>
-
-        <h2 class="section-title">Recent Flights</h2>
-        <div class="card table-wrap">
-          <table>
-            <thead><tr><th>Flight</th><th>Airline</th><th>Route</th><th>Aircraft</th></tr></thead>
-            <tbody id="recentFlights"><tr><td colspan="4" class="empty">No flights saved yet. Create your first flight.</td></tr></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="page" id="page-flightSetup">
-        <div class="page-heading">
-          <h1>Flight Setup</h1>
-          <p>Create and save your flight information to Firebase.</p>
-        </div>
-        <div class="card">
-          <form id="flightForm">
-            <div class="form-grid">
-              <div><label>Airline name</label><input id="airline" placeholder="Example: SriLankan Airlines" required></div>
-              <div><label>Flight number</label><input id="flightNumber" placeholder="Example: UL 225" required></div>
-              <div><label>Departure airport (IATA)</label><input id="departure" placeholder="Example: DXB" maxlength="4" required></div>
-              <div><label>Destination airport (IATA)</label><input id="destination" placeholder="Example: CMB" maxlength="4" required></div>
-              <div><label>Aircraft</label><input id="aircraft" placeholder="Example: Airbus A330-300" required></div>
-              <div><label>Flight date</label><input id="flightDate" type="date" required></div>
-              <div><label>Scheduled departure time</label><input id="departureTime" type="time"></div>
-              <div><label>Captain name (optional)</label><input id="captain" placeholder="Captain name"></div>
-            </div>
-            <div class="form-actions">
-              <button class="primary" id="saveFlightButton">Save Flight</button>
-              <button class="secondary" type="reset">Clear Form</button>
-            </div>
-            <p id="flightMessage" class="page-message"></p>
-          </form>
-        </div>
-      </section>
-
-      
-<section class="page" id="page-checkin">
-  <div class="page-heading">
-    <h1>Passenger Check-in</h1>
-    <p>Register passengers, select seats and generate boarding passes.</p>
+ <aside class="sidebar" id="sidebar">
+  <div class="brand"><div class="brand-icon">✈</div><div><b>INFINITE FLIGHT<br>COMPANION</b><small>FLIGHT EXPERIENCE SYSTEM</small></div></div>
+  <div class="nav-label">MAIN MENU</div>
+  <button class="nav active" data-page="dashboard">▦ Dashboard</button><button class="nav" data-page="flightSetup">✈ Flight Setup</button><button class="nav" data-page="checkin">▣ Passenger Check-in</button><button class="nav" data-page="boarding">♧ Boarding</button>
+  <div class="nav-label">FLIGHT EXPERIENCE</div>
+  <button class="nav" data-page="cabin">◉ Cabin Experience</button><button class="nav" data-page="tracker">⌖ Live Tracker</button><button class="nav" data-page="audio">♫ Audio Centre</button>
+  <div class="nav-label">MANAGEMENT</div>
+  <button class="nav" data-page="history">◷ Flight History</button><button class="nav" data-page="users">♙ User Management</button><button class="nav" data-page="settings">⚙ Settings</button>
+  <div class="side-bottom"><p id="accountEmail" class="muted small"></p><button class="nav" id="logoutButton">⇥ Sign Out</button></div>
+ </aside>
+ <main class="main">
+  <header class="topbar"><div class="row" style="flex:0;align-items:center"><button class="secondary menuToggle" id="menuToggle">☰</button><strong id="topTitle">Dashboard</strong></div><div class="row" style="flex:0"><span class="pill">● Workspace</span><button class="secondary" id="topLogoutButton">Logout</button></div></header>
+  <div class="content">
+   <section class="page active" id="page-dashboard">
+    <div class="heading"><h1>Flight Operations Dashboard</h1><p>Welcome to your Infinite Flight Companion workspace.</p></div>
+    <div class="grid"><div class="stat"><small>Total Flights</small><b id="totalFlights">0</b><small>Saved flights</small></div><div class="stat"><small>Active Flight</small><b id="activeFlight">—</b><small>Selected flight</small></div><div class="stat"><small>Passengers</small><b id="totalPassengers">0</b><small>Registered passengers</small></div><div class="stat"><small>Audio Library</small><b>35</b><small>Configured MP3 paths</small></div></div>
+    <h2 class="section-title">Quick Actions</h2><div class="quick"><button data-go="flightSetup"><b>✈ Create Flight</b><span class="muted small">Set airline, route and aircraft.</span></button><button data-go="checkin"><b>▣ Passenger Check-in</b><span class="muted small">Register passengers and seats.</span></button><button data-go="boarding"><b>♧ Start Boarding</b><span class="muted small">Run boarding groups and calls.</span></button><button data-go="audio"><b>♫ Audio Centre</b><span class="muted small">Play announcements and music.</span></button><button data-go="cabin"><b>◉ Cabin Experience</b><span class="muted small">Cabin and captain announcements.</span></button><button data-go="tracker"><b>⌖ Live Tracker</b><span class="muted small">Simulator connection status.</span></button></div>
+    <h2 class="section-title">Recent Flights</h2><div class="card tablewrap"><table><thead><tr><th>Flight</th><th>Airline</th><th>Route</th><th>Aircraft</th></tr></thead><tbody id="recentFlights"><tr><td colspan="4">No flights saved yet.</td></tr></tbody></table></div>
+   </section>
+   <section class="page" id="page-flightSetup">
+    <div class="heading"><h1>Flight Setup</h1><p>Create a flight record for your passenger experience.</p></div>
+    <div class="card"><form id="flightForm"><div class="formgrid">
+     <div><label>Airline</label><input id="airline" required placeholder="SriLankan Airlines"></div><div><label>Flight number</label><input id="flightNumber" required placeholder="UL 225"></div>
+     <div><label>Departure airport (IATA)</label><input id="departure" required maxlength="4" placeholder="DXB"></div><div><label>Destination airport (IATA)</label><input id="destination" required maxlength="4" placeholder="CMB"></div>
+     <div><label>Aircraft</label><input id="aircraft" required placeholder="Airbus A330-300"></div><div><label>Flight date</label><input id="flightDate" type="date" required></div>
+     <div><label>Departure time</label><input id="departureTime" type="time"></div><div><label>Captain name (optional)</label><input id="captain" placeholder="Captain name"></div>
+    </div><button class="primary" id="saveFlightButton">Save Flight</button><button class="secondary" type="reset">Clear</button><p id="flightMessage" class="message"></p></form></div>
+   </section>
+   <section class="page" id="page-checkin">
+    <div class="heading"><h1>Passenger Check-in</h1><p>Register passengers, select seats and create boarding passes.</p></div>
+    <div class="card"><label>Select flight</label><select id="passengerFlight"><option value="">Select a saved flight</option></select><p id="passengerFlightInfo" class="muted small"></p></div>
+    <div class="card"><h3>Passenger details</h3><form id="passengerForm"><div class="formgrid"><div><label>Full name</label><input id="passengerName" required></div><div><label>Phone (optional)</label><input id="passengerPhone" type="tel"></div><div><label>Email (optional)</label><input id="passengerEmail" type="email"></div><div><label>Boarding group</label><select id="passengerGroup"><option>Group 1</option><option>Group 2</option><option>Group 3</option><option>Group 4</option></select></div></div><h3>Select a seat</h3><p class="muted small">A–F layout, 20 rows. Occupied seats are disabled.</p><div id="seatMap" class="seatmap">Select a flight first.</div><p id="selectedSeatText" class="ok">No seat selected.</p><button class="primary" id="registerPassengerButton">Register Passenger</button><p id="passengerMessage" class="message"></p></form></div>
+    <div class="card"><h3>Registered passengers</h3><div class="tablewrap"><table><thead><tr><th>Name</th><th>Seat</th><th>Group</th><th>Status</th><th>Pass</th></tr></thead><tbody id="passengerList"><tr><td colspan="5">Select a flight.</td></tr></tbody></table></div></div>
+    <div id="boardingPass" class="pass hidden"><div class="row"><b>✈ INFINITE FLIGHT COMPANION</b><b>BOARDING PASS</b></div><hr><p>PASSENGER</p><h2 id="bpName"></h2><div class="row"><div><p>FLIGHT</p><h3 id="bpFlight"></h3></div><div><p>ROUTE</p><h3 id="bpRoute"></h3></div><div><p>SEAT</p><h2 id="bpSeat" class="gold"></h2></div></div><div id="boardingQR"></div><button class="primary" id="printPassButton">Print boarding pass</button></div>
+   </section>
+   <section class="page" id="page-boarding">
+    <div class="heading"><h1>Boarding Management</h1><p>Run airport boarding calls and track passenger boarding.</p></div>
+    <div class="card"><label>Flight</label><select id="boardingFlight"><option value="">Select a flight</option></select><p id="boardingInfo" class="muted small"></p><div class="row"><div class="stat"><small>Registered</small><b id="boardRegistered">0</b></div><div class="stat"><small>Boarded</small><b id="boardCount">0</b></div><div class="stat"><small>Remaining</small><b id="boardRemaining">0</b></div></div></div>
+    <div class="card"><h3>Airport announcements</h3><div class="row"><button class="primary" data-board-audio="02_boarding_open">Open boarding</button><button class="secondary" data-board-audio="03_priority_boarding">Priority boarding</button><button class="secondary" data-board-audio="04_group_boarding">Group boarding</button><button class="secondary" data-board-audio="05_final_boarding">Final boarding</button><button class="secondary" data-board-audio="06_boarding_completed">Boarding completed</button></div><p id="boardingMessage" class="message"></p></div>
+    <div class="card"><h3>Passenger boarding list</h3><div class="tablewrap"><table><thead><tr><th>Passenger</th><th>Seat</th><th>Group</th><th>Status</th><th>Action</th></tr></thead><tbody id="boardingList"><tr><td colspan="5">Select a flight.</td></tr></tbody></table></div></div>
+   </section>
+   <section class="page" id="page-cabin">
+    <div class="heading"><h1>Cabin Experience</h1><p>Control cabin crew and captain announcements throughout the flight.</p></div>
+    <div class="card"><label>Current flight</label><select id="cabinFlight"><option value="">Select a flight</option></select><p id="cabinFlightInfo" class="muted small"></p><p>Flight phase</p><div class="phase" id="currentPhase">Pre-flight</div><label>Set flight phase</label><select id="phaseSelect"><option>Pre-flight</option><option>Boarding</option><option>Doors closed</option><option>After takeoff</option><option>Climb</option><option>Cruise</option><option>Turbulence</option><option>Descent</option><option>Final approach</option><option>After landing</option><option>Disembarkation</option></select><button class="secondary" id="setPhaseButton">Update phase</button></div>
+    <div class="card"><h3>Cabin crew</h3><div class="row"><button class="secondary" data-cabin-audio="07_cabin_preparation">Cabin preparation</button><button class="secondary" data-cabin-audio="08_safety_demonstration">Safety demo</button><button class="secondary" data-cabin-audio="10_after_takeoff">After takeoff</button><button class="secondary" data-cabin-audio="11_cabin_service">Cabin service</button><button class="secondary" data-cabin-audio="12_relaxation">Relaxation</button><button class="secondary" data-cabin-audio="13_turbulence">Turbulence</button><button class="secondary" data-cabin-audio="14_seatbelt_reminder">Seatbelt reminder</button><button class="secondary" data-cabin-audio="15_descent_preparation">Descent preparation</button><button class="secondary" data-cabin-audio="16_landing_preparation">Landing preparation</button><button class="secondary" data-cabin-audio="17_after_landing">After landing</button><button class="secondary" data-cabin-audio="18_disembarkation">Disembarkation</button><button class="secondary" data-cabin-audio="19_final_goodbye">Final goodbye</button></div></div>
+    <div class="card"><h3>Captain announcements</h3><div class="row"><button class="secondary" data-captain-audio="20_captain_welcome">Welcome</button><button class="secondary" data-captain-audio="21_captain_departure">Departure</button><button class="secondary" data-captain-audio="22_captain_takeoff">Takeoff</button><button class="secondary" data-captain-audio="23_captain_climb">Climb</button><button class="secondary" data-captain-audio="24_captain_cruise">Cruise</button><button class="secondary" data-captain-audio="25_captain_turbulence">Turbulence</button><button class="secondary" data-captain-audio="26_captain_route_update">Route update</button><button class="secondary" data-captain-audio="27_captain_descent">Descent</button><button class="secondary" data-captain-audio="28_captain_final_approach">Final approach</button><button class="secondary" data-captain-audio="29_captain_after_landing">After landing</button><button class="secondary" data-captain-audio="30_captain_delay">Delay</button></div></div>
+   </section>
+   <section class="page" id="page-tracker">
+    <div class="heading"><h1>Live Flight Tracker</h1><p>Simulator connection and aircraft telemetry.</p></div>
+    <div class="notice">The website cannot connect directly to Infinite Flight's TCP interface from a browser. Real simulator telemetry needs the local Connect API bridge on the computer running Infinite Flight. This screen currently provides a manual test panel; it does not pretend to show live simulator data.</div>
+    <div class="card"><div class="row"><div><label>Connection</label><b class="err" id="trackerStatus">Not connected</b></div><div><label>Flight</label><select id="trackerFlight"><option value="">Select flight</option></select></div></div><div class="formgrid"><div><label>Altitude (ft)</label><input id="manualAltitude" type="number" placeholder="35000"></div><div><label>Ground speed (kt)</label><input id="manualSpeed" type="number" placeholder="450"></div><div><label>Heading (°)</label><input id="manualHeading" type="number" placeholder="180"></div><div><label>Phase</label><input id="manualTrackerPhase" placeholder="Cruise"></div></div><button class="primary" id="saveTelemetryButton">Update manual display</button><div class="grid" style="margin-top:15px"><div class="stat"><small>Altitude</small><b id="trackerAltitude">—</b></div><div class="stat"><small>Ground speed</small><b id="trackerSpeed">—</b></div><div class="stat"><small>Heading</small><b id="trackerHeading">—</b></div><div class="stat"><small>Phase</small><b id="trackerPhase">—</b></div></div></div>
+   </section>
+   <section class="page" id="page-audio">
+    <div class="heading"><h1>Audio Centre</h1><p>Your 35 MP3 files are connected using the GitHub folder paths.</p></div>
+    <div class="card"><div class="row"><div><b>Audio playback</b><p class="muted small">Announcements play one at a time. Music pauses during announcements and resumes afterwards.</p></div><span class="pill" id="audioStatus">Ready</span></div><div class="row"><button class="primary" id="playBoardingMusic">Play boarding music</button><button class="secondary" id="playLoungeMusic">Play lounge music</button><button class="danger" id="stopAudio">Stop all audio</button></div><p id="audioMessage" class="message"></p></div>
+    <div class="card"><h3>Airport PA</h3><div id="airportAudioList"></div></div><div class="card"><h3>Cabin announcements</h3><div id="cabinAudioList"></div></div><div class="card"><h3>Captain announcements</h3><div id="captainAudioList"></div></div><div class="card"><h3>Sound effects</h3><div id="effectsAudioList"></div></div>
+   </section>
+   <section class="page" id="page-history"><div class="heading"><h1>Flight History</h1><p>All flights saved to your Firestore workspace.</p></div><div class="card tablewrap"><table><thead><tr><th>Flight</th><th>Airline</th><th>Route</th><th>Date</th><th>Aircraft</th></tr></thead><tbody id="historyFlights"><tr><td colspan="5">No history.</td></tr></tbody></table></div></section>
+   <section class="page" id="page-users"><div class="heading"><h1>User Management</h1><p>Workspace access information.</p></div><div class="card"><p id="userManagementInfo">Loading member access...</p><div class="notice">For security, don't create public sign-up forms that can assign owner or administrator roles. New users must be created in Firebase Authentication and added to workspaces/main/members with an approved role. A secure invitation workflow needs a trusted server function.</div></div></section>
+   <section class="page" id="page-settings"><div class="heading"><h1>Settings</h1><p>Account and workspace information.</p></div><div class="card"><h3>Account</h3><p id="settingsEmail" class="muted"></p><p id="settingsRole" class="muted"></p><p>Workspace: Infinite Flight Companion</p><p>Database: Cloud Firestore</p><p>Audio base path: <code>audio/</code></p><button class="secondary" id="settingsStopAudio">Stop audio</button></div></section>
   </div>
-
-  <div class="card">
-    <h2>1. Select Flight</h2>
-    <label>Choose a saved flight</label>
-    <select id="passengerFlight">
-      <option value="">Select a flight</option>
-    </select>
-    <p id="passengerFlightInfo" class="muted"></p>
-  </div>
-
-  <div class="card" style="margin-top:18px">
-    <h2>2. Passenger Details</h2>
-    <form id="passengerForm">
-      <div class="form-grid">
-        <div>
-          <label>Passenger full name</label>
-          <input id="passengerName" required placeholder="Full name">
-        </div>
-        <div>
-          <label>Phone number (optional)</label>
-          <input id="passengerPhone" type="tel" placeholder="Phone number">
-        </div>
-        <div>
-          <label>Email (optional)</label>
-          <input id="passengerEmail" type="email" placeholder="Email address">
-        </div>
-      </div>
-
-      <h3>3. Select a Seat</h3>
-      <div class="notice">
-        Available seats are selectable. Occupied seats cannot be selected.
-        This initial layout uses a standard A–F seating arrangement.
-      </div>
-
-      <div class="seat-legend">
-        <span><i class="seat-dot available"></i> Available</span>
-        <span><i class="seat-dot selected"></i> Selected</span>
-        <span><i class="seat-dot occupied"></i> Occupied</span>
-      </div>
-
-      <div id="seatMap" class="seat-map">
-        <p class="muted">Select a flight to see available seats.</p>
-      </div>
-
-      <p id="selectedSeatText" class="success">No seat selected.</p>
-
-      <button class="primary" id="registerPassengerButton" type="submit">
-        Register Passenger
-      </button>
-      <p id="passengerMessage" class="page-message"></p>
-    </form>
-  </div>
-
-  <div class="card" style="margin-top:18px">
-    <h2>4. Registered Passengers</h2>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>Passenger</th><th>Seat</th><th>Status</th><th>Boarding Pass</th></tr>
-        </thead>
-        <tbody id="passengerList">
-          <tr><td colspan="4" class="empty">Select a flight first.</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div id="boardingPass" class="boarding-pass hidden">
-    <div class="boarding-pass-header">
-      <strong>✈ INFINITE FLIGHT COMPANION</strong>
-      <span>BOARDING PASS</span>
-    </div>
-    <div class="boarding-pass-body">
-      <div>
-        <p class="muted">PASSENGER</p>
-        <h2 id="bpName"></h2>
-        <p class="muted">FLIGHT</p>
-        <h3 id="bpFlight"></h3>
-        <p class="muted">FROM</p>
-        <h3 id="bpFrom"></h3>
-        <p class="muted">TO</p>
-        <h3 id="bpTo"></h3>
-        <p class="muted">SEAT</p>
-        <h2 id="bpSeat" class="gold-text"></h2>
-      </div>
-      <div id="boardingQR"></div>
-    </div>
-    <p class="boarding-pass-footer">
-      Please keep this boarding pass ready for boarding.
-    </p>
-    <button class="primary" type="button" onclick="window.print()">
-      Print Boarding Pass
-    </button>
-  </div>
-</section>
-
-
-      <section class="page" id="page-boarding">
-        <div class="page-heading"><h1>Boarding Management</h1><p>Manage passenger boarding and airport announcements.</p></div>
-        <div class="notice">This section will include boarding groups, priority boarding, final calls, boarding complete and automated airport announcements.</div>
-      </section>
-
-      <section class="page" id="page-cabin">
-        <div class="page-heading"><h1>Cabin Experience</h1><p>Manage the passenger experience inside the aircraft.</p></div>
-        <div class="notice">This section will include cabin crew announcements, captain announcements, flight phases, chimes and cabin relaxation music.</div>
-      </section>
-
-      <section class="page" id="page-tracker">
-        <div class="page-heading"><h1>Live Flight Tracker</h1><p>Simulator connection and live aircraft information.</p></div>
-        <div class="notice">The live tracker requires the Infinite Flight Connect API and a local bridge running on the computer with Infinite Flight. Firebase alone cannot read simulator telemetry.</div>
-      </section>
-
-      <section class="page" id="page-audio">
-        <div class="page-heading"><h1>Audio Centre</h1><p>Manage airport, cabin and captain announcement audio.</p></div>
-        <div class="notice">Your existing MP3 files and sound effects will be organised here. We'll add the chime → 2-second pause → announcement sequence, radio effects, audio queue and background music controls.</div>
-      </section>
-
-      <section class="page" id="page-history">
-        <div class="page-heading"><h1>Flight History</h1><p>Review your saved flight information.</p></div>
-        <div class="card table-wrap">
-          <table>
-            <thead><tr><th>Flight</th><th>Airline</th><th>Route</th><th>Date</th><th>Aircraft</th></tr></thead>
-            <tbody id="historyFlights"><tr><td colspan="5" class="empty">No flight history yet.</td></tr></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="page" id="page-users">
-        <div class="page-heading"><h1>User Management</h1><p>Manage access to your shared workspace.</p></div>
-        <div class="notice">Your account is the workspace owner. We'll build secure invitations, member roles and access management here. For now, do not create member accounts through an ordinary public registration form.</div>
-      </section>
-
-      <section class="page" id="page-settings">
-        <div class="page-heading"><h1>Settings</h1><p>Account and application information.</p></div>
-        <div class="card">
-          <h3>Account Information</h3>
-          <p class="muted" id="settingsEmail">Loading...</p>
-          <p class="muted" id="settingsRole"></p>
-          <p class="muted">Workspace: Infinite Flight Companion</p>
-          <p class="muted">Database: Cloud Firestore</p>
-        </div>
-      </section>
-
-    </div>
-  </main>
+ </main>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
-import {
-  getAuth, signInWithEmailAndPassword, onAuthStateChanged,
-  signOut, sendPasswordResetEmail
-} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
-import {
-  getFirestore, doc, getDoc, collection, addDoc,
-  getDocs, query, orderBy, limit, serverTimestamp, where
-} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
+import{initializeApp}from"https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut,sendPasswordResetEmail}from"https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
+import{getFirestore,doc,getDoc,collection,addDoc,getDocs,query,orderBy,limit,serverTimestamp,where,updateDoc}from"https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDQgKie9EHcjG81IWxez_vxPue4zfFnZbk",
-  authDomain: "infinite-flight-companion.firebaseapp.com",
-  projectId: "infinite-flight-companion",
-  storageBucket: "infinite-flight-companion.firebasestorage.app",
-  messagingSenderId: "208265827432",
-  appId: "1:208265827432:web:72d8d6d7e2ce38ec1017dd"
+const firebaseConfig={
+ apiKey:"AIzaSyDQkGie9EHcjG81IWxez_vxPue4zfFnZbk",
+ authDomain:"infinite-flight-companion.firebaseapp.com",
+ projectId:"infinite-flight-companion",
+ storageBucket:"infinite-flight-companion.firebasestorage.app",
+ messagingSenderId:"208265827432",
+ appId:"1:208265827432:web:72d8d6d7e2ce38ec1017dd"
 };
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-let currentUser = null;
-let currentRole = null;
-let flights = [];
-
-const $ = id => document.getElementById(id);
-
-function message(id,text,type="error"){
-  const el = $(id);
-  el.textContent = text;
-  el.className = "page-message " + type;
-}
-
-function showApp(){
-  $("loginPage").classList.add("hidden");
-  $("app").classList.remove("hidden");
-}
-
-function showLogin(){
-  $("app").classList.add("hidden");
-  $("loginPage").classList.remove("hidden");
-}
-
-function navigate(page){
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  document.querySelectorAll(".nav-button[data-page]").forEach(b=>b.classList.remove("active"));
-
-  const target = $("page-"+page);
-  if(!target) return;
-  target.classList.add("active");
-  if (page === "checkin") {
-  populatePassengerFlights();
-  loadPassengers();
-}
-
-  const nav = document.querySelector(`.nav-button[data-page="${page}"]`);
-  if(nav) nav.classList.add("active");
-
-  $("topTitle").textContent = nav ? nav.textContent.trim() : "Dashboard";
-  $("sidebar").classList.remove("open");
-  $("overlay").classList.remove("show");
-}
-
-document.querySelectorAll("[data-page]").forEach(button=>{
-  button.addEventListener("click",()=>navigate(button.dataset.page));
-});
-
-document.querySelectorAll("[data-go]").forEach(button=>{
-  button.addEventListener("click",()=>navigate(button.dataset.go));
-});
-
-$("menuToggle").addEventListener("click",()=>{
-  $("sidebar").classList.toggle("open");
-  $("overlay").classList.toggle("show");
-});
-$("overlay").addEventListener("click",()=>{
-  $("sidebar").classList.remove("open");
-  $("overlay").classList.remove("show");
-});
-
-$("loginForm").addEventListener("submit",async event=>{
-  event.preventDefault();
-  const button=$("loginButton");
-  button.disabled=true;
-  button.textContent="Signing in...";
-  message("loginMessage","");
-  try{
-    await signInWithEmailAndPassword(
-      auth,$("email").value.trim(),$("password").value
-    );
-  }catch(error){
-    message("loginMessage",error.message);
-  }finally{
-    button.disabled=false;
-    button.textContent="Sign In";
-  }
-});
-
-$("resetButton").addEventListener("click",async()=>{
-  const email=$("email").value.trim();
-  if(!email){message("loginMessage","Enter your email address first.");return;}
-  try{
-    await sendPasswordResetEmail(auth,email);
-    message("loginMessage","Password reset email sent.","success");
-  }catch(error){message("loginMessage",error.message);}
-});
-
-async function logoutUser() {
-  try {
-    await signOut(auth);
-    currentUser = null;
-    currentRole = null;
-    showLogin();
-  } catch (error) {
-    alert("Logout failed: " + error.message);
-  }
-}
-
-$("logoutButton").addEventListener("click", logoutUser);
-
-$("topLogoutButton").addEventListener("click", logoutUser);
-
-async function loadWorkspace(user){
-  const memberRef=doc(db,"workspaces","main","members",user.uid);
-  const memberSnap=await getDoc(memberRef);
-
-  if(!memberSnap.exists()){
-    await signOut(auth);
-    throw new Error("This account is not a member of the workspace.");
-  }
-
-  const member=memberSnap.data();
-  if(!["owner","member"].includes(member.role)){
-    await signOut(auth);
-    throw new Error("This account has an invalid workspace role.");
-  }
-
-  const workspaceSnap=await getDoc(doc(db,"workspaces","main"));
-  if(!workspaceSnap.exists()) throw new Error("Workspace document not found.");
-
-  currentRole=member.role;
-  currentUser=user;
-
-  $("accountEmail").textContent=user.email;
-  $("settingsEmail").textContent="Email: "+user.email;
-  $("settingsRole").textContent="Role: "+currentRole;
-  showApp();
-  await loadFlights();
-}
-
-async function loadFlights(){
-  try{
-    const flightsRef=collection(db,"workspaces","main","flights");
-    const flightQuery=query(flightsRef,orderBy("createdAt","desc"),limit(50));
-    const snapshot=await getDocs(flightQuery);
-    flights=snapshot.docs.map(d=>({id:d.id,...d.data()}));
-    renderFlights();
-    populatePassengerFlights();
-  }catch(error){
-    console.error("Flight loading error:",error);
-    message("flightMessage","Could not load flights: "+error.message);
-  }
-}
-
-function renderFlights(){
-  $("totalFlights").textContent=flights.length;
-  $("activeFlight").textContent=flights.length ? "1" : "0";
-
-  const recent=$("recentFlights");
-  const history=$("historyFlights");
-
-  if(!flights.length){
-    recent.innerHTML='<tr><td colspan="4" class="empty">No flights saved yet. Create your first flight.</td></tr>';
-    history.innerHTML='<tr><td colspan="5" class="empty">No flight history yet.</td></tr>';
-    return;
-  }
-
-  recent.innerHTML=flights.slice(0,5).map(f=>`
-    <tr>
-      <td>${escapeHTML(f.flightNumber)}</td>
-      <td>${escapeHTML(f.airline)}</td>
-      <td>${escapeHTML(f.departure)} → ${escapeHTML(f.destination)}</td>
-      <td>${escapeHTML(f.aircraft)}</td>
-    </tr>`).join("");
-
-  history.innerHTML=flights.map(f=>`
-    <tr>
-      <td>${escapeHTML(f.flightNumber)}</td>
-      <td>${escapeHTML(f.airline)}</td>
-      <td>${escapeHTML(f.departure)} → ${escapeHTML(f.destination)}</td>
-      <td>${escapeHTML(f.flightDate||"")}</td>
-      <td>${escapeHTML(f.aircraft)}</td>
-    </tr>`).join("");
-}
-
-function escapeHTML(value){
-  return String(value??"").replace(/[&<>"']/g,char=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  })[char]);
-}
-
-$("flightForm").addEventListener("submit",async event=>{
-  event.preventDefault();
-  if(!currentUser){message("flightMessage","Please sign in again.");return;}
-
-  const button=$("saveFlightButton");
-  button.disabled=true;
-  button.textContent="Saving...";
-
-  const flight={
-    airline:$("airline").value.trim(),
-    flightNumber:$("flightNumber").value.trim().toUpperCase(),
-    departure:$("departure").value.trim().toUpperCase(),
-    destination:$("destination").value.trim().toUpperCase(),
-    aircraft:$("aircraft").value.trim(),
-    flightDate:$("flightDate").value,
-    departureTime:$("departureTime").value,
-    captain:$("captain").value.trim(),
-    createdBy:currentUser.uid,
-    createdAt:serverTimestamp()
-  };
-
-  try{
-    await addDoc(collection(db,"workspaces","main","flights"),flight);
-    message("flightMessage","Flight saved successfully!","success");
-    $("flightForm").reset();
-    await loadFlights();
-  }catch(error){
-    message("flightMessage","Could not save flight: "+error.message);
-  }finally{
-    button.disabled=false;
-    button.textContent="Save Flight";
-  }
-});
-
-// ========================================
-// PASSENGER CHECK-IN SYSTEM
-// ========================================
-
-let selectedSeat = "";
-let currentPassengers = [];
-let selectedPassengerFlight = null;
-
-function populatePassengerFlights() {
-  const select = $("passengerFlight");
-  const previous = select.value;
-
-  select.innerHTML = '<option value="">Select a flight</option>';
-
-  flights.forEach(f => {
-    const option = document.createElement("option");
-    option.value = f.id;
-    option.textContent =
-      `${f.flightNumber} — ${f.departure} to ${f.destination}`;
-    select.appendChild(option);
-  });
-
-  if (flights.some(f => f.id === previous)) {
-    select.value = previous;
-  }
-}
-
-async function loadPassengers() {
-  const flightId = $("passengerFlight").value;
-  selectedSeat = "";
-  $("selectedSeatText").textContent = "No seat selected.";
-  $("boardingPass").classList.add("hidden");
-
-  if (!flightId) {
-    $("seatMap").innerHTML =
-      '<p class="muted">Select a flight to see available seats.</p>';
-    $("passengerList").innerHTML =
-      '<tr><td colspan="4" class="empty">Select a flight first.</td></tr>';
-    $("passengerFlightInfo").textContent = "";
-    return;
-  }
-
-  selectedPassengerFlight = flights.find(f => f.id === flightId);
-
-  if (!selectedPassengerFlight) return;
-
-  const f = selectedPassengerFlight;
-
-  $("passengerFlightInfo").textContent =
-    `${f.airline} | ${f.flightNumber} | ${f.departure} → ${f.destination}`;
-
-  try {
-    const passengerQuery = query(
-      collection(db, "workspaces", "main", "passengers"),
-      where("flightId", "==", flightId)
-    );
-
-    const snapshot = await getDocs(passengerQuery);
-    currentPassengers = snapshot.docs.map(d => ({
-      id: d.id,
-      ...d.data()
-    }));
-
-    renderSeatMap();
-    renderPassengerList();
-  } catch (error) {
-    message("passengerMessage", "Could not load passengers: " + error.message);
-  }
-}
-
-function renderSeatMap() {
-  const map = $("seatMap");
-  map.innerHTML = "";
-
-  const columns = ["A", "B", "C", "", "D", "E", "F"];
-
-  for (let row = 1; row <= 20; row++) {
-    columns.forEach(column => {
-      if (!column) {
-        const aisle = document.createElement("div");
-        aisle.className = "aisle";
-        map.appendChild(aisle);
-        return;
-      }
-
-      const seat = column + row;
-      const occupied = currentPassengers.some(p => p.seat === seat);
-
-      const button = document.createElement("button");
-      button.type = "button";
-      button.textContent = seat;
-      button.className = "seat";
-
-      if (occupied) {
-        button.classList.add("occupied");
-        button.disabled = true;
-        button.title = "Seat occupied";
-      } else if (selectedSeat === seat) {
-        button.classList.add("selected");
-      }
-
-      button.addEventListener("click", () => {
-        selectedSeat = seat;
-        $("selectedSeatText").textContent = "Selected seat: " + seat;
-        renderSeatMap();
-      });
-
-      map.appendChild(button);
-    });
-  }
-}
-
-function renderPassengerList() {
-  const body = $("passengerList");
-
-  if (!currentPassengers.length) {
-    body.innerHTML =
-      '<tr><td colspan="4" class="empty">No passengers registered for this flight.</td></tr>';
-    return;
-  }
-
-  body.innerHTML = currentPassengers.map(p => `
-    <tr>
-      <td>${escapeHTML(p.name)}</td>
-      <td>${escapeHTML(p.seat)}</td>
-      <td><span class="success">Checked in</span></td>
-      <td>
-        <button class="secondary" type="button"
-          data-boarding-pass="${escapeHTML(p.id)}">
-          View Pass
-        </button>
-      </td>
-    </tr>
-  `).join("");
-
-  body.querySelectorAll("[data-boarding-pass]").forEach(button => {
-    button.addEventListener("click", () => {
-      const passenger = currentPassengers.find(
-        p => p.id === button.dataset.boardingPass
-      );
-      if (passenger) showBoardingPass(passenger);
-    });
-  });
-}
-
-$("passengerFlight").addEventListener("change", loadPassengers);
-
-$("passengerForm").addEventListener("submit", async event => {
-  event.preventDefault();
-
-  const flight = selectedPassengerFlight;
-
-  if (!flight) {
-    message("passengerMessage", "Please select a flight first.");
-    return;
-  }
-
-  if (!selectedSeat) {
-    message("passengerMessage", "Please select a seat.");
-    return;
-  }
-
-  if (currentPassengers.some(p => p.seat === selectedSeat)) {
-    message("passengerMessage", "That seat is already occupied.");
-    await loadPassengers();
-    return;
-  }
-
-  const button = $("registerPassengerButton");
-  button.disabled = true;
-  button.textContent = "Registering...";
-
-  const passenger = {
-    name: $("passengerName").value.trim(),
-    phone: $("passengerPhone").value.trim(),
-    email: $("passengerEmail").value.trim(),
-    seat: selectedSeat,
-    flightId: flight.id,
-    flightNumber: flight.flightNumber,
-    airline: flight.airline,
-    departure: flight.departure,
-    destination: flight.destination,
-    checkedIn: true,
-    createdBy: currentUser.uid,
-    createdAt: serverTimestamp()
-  };
-
-  try {
-    const result = await addDoc(
-      collection(db, "workspaces", "main", "passengers"),
-      passenger
-    );
-
-    const savedPassenger = {
-      id: result.id,
-      ...passenger
-    };
-
-    message("passengerMessage", "Passenger registered successfully!", "success");
-
-    $("passengerForm").reset();
-    selectedSeat = "";
-
-    await loadPassengers();
-    showBoardingPass(savedPassenger);
-
-  } catch (error) {
-    message("passengerMessage", "Registration failed: " + error.message);
-  } finally {
-    button.disabled = false;
-    button.textContent = "Register Passenger";
-  }
-});
-
-function showBoardingPass(passenger) {
-  $("bpName").textContent = passenger.name;
-  $("bpFlight").textContent = passenger.flightNumber;
-  $("bpFrom").textContent = passenger.departure;
-  $("bpTo").textContent = passenger.destination;
-  $("bpSeat").textContent = passenger.seat;
-
-  const qr = $("boardingQR");
-  qr.innerHTML = "";
-
-  if (typeof QRCode === "undefined") {
-    qr.textContent = "QR library unavailable. Check your internet connection.";
-  } else {
-    const qrData = JSON.stringify({
-      bookingId: passenger.id,
-      flight: passenger.flightNumber,
-      seat: passenger.seat
-    });
-
-    new QRCode(qr, {
-      text: qrData,
-      width: 130,
-      height: 130
-    });
-  }
-
-  $("boardingPass").classList.remove("hidden");
-  $("boardingPass").scrollIntoView({ behavior: "smooth" });
-}
-
-window.addEventListener("afterprint", () => {
-  document.body.classList.remove("print-pass");
-});
-
-// Print only the boarding pass.
-$("boardingPass").querySelector("button").addEventListener("click", () => {
-  document.body.classList.add("print-pass");
-});
-
-onAuthStateChanged(auth,async user=>{
-  if(!user){
-    currentUser=null;
-    currentRole=null;
-    showLogin();
-    return;
-  }
-  try{
-    await loadWorkspace(user);
-  }catch(error){
-    console.error(error);
-    showLogin();
-    message("loginMessage",error.message);
-  }
-});
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
+const $=id=>document.getElementById(id);
+let currentUser=null,currentRole=null,flights=[],passengers=[],selectedSeat="",selectedCheckinFlight=null;
+const path=(folder,file)=>`audio/${folder}/${file}.mp3`;
+const files={
+ airport:[["01_welcome_aboard","Welcome aboard"],["02_boarding_open","Boarding open"],["03_priority_boarding","Priority boarding"],["04_group_boarding","Group boarding"],["05_final_boarding","Final boarding"],["06_boarding_completed","Boarding completed"]],
+ cabin:[["07_cabin_preparation","Cabin preparation"],["08_safety_demonstration","Safety demonstration"],["09_doors_closed","Doors closed"],["10_after_takeoff","After takeoff"],["11_cabin_service","Cabin service"],["12_relaxation","Relaxation"],["13_turbulence","Turbulence"],["14_seatbelt_reminder","Seatbelt reminder"],["15_descent_preparation","Descent preparation"],["16_landing_preparation","Landing preparation"],["17_after_landing","After landing"],["18_disembarkation","Disembarkation"],["19_final_goodbye","Final goodbye"]],
+ captain:[["20_captain_welcome","Captain welcome"],["21_captain_departure","Captain departure"],["22_captain_takeoff","Captain takeoff"],["23_captain_climb","Captain climb"],["24_captain_cruise","Captain cruise"],["25_captain_turbulence","Captain turbulence"],["26_captain_route_update","Captain route update"],["27_captain_descent","Captain descent"],["28_captain_final_approach","Captain final approach"],["29_captain_after_landing","Captain after landing"],["30_captain_delay","Captain delay"]],
+ music:[["31_boarding_music","Boarding music"],["32_lounge_music","Lounge music"]],
+ effects:[["33_airport_pa_chime","Airport PA chime"],["34_cabin_announcement_chime","Cabin announcement chime"],["35_captain_radio_end","Captain radio end"]]
+};
+let musicAudio=null,currentAnnouncement=null,playToken=0;
+function msg(id,text,kind="muted"){const e=$(id);if(e){e.textContent=text;e.className="message "+kind}}
+function safe(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function showApp(){$("loginPage").classList.add("hidden");$("app").classList.remove("hidden")}
+function showLogin(){$("app").classList.add("hidden");$("loginPage").classList.remove("hidden")}
+function navigate(page){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".nav[data-page]").forEach(x=>x.classList.toggle("active",x.dataset.page===page));$("page-"+page)?.classList.add("active");$("topTitle").textContent=document.querySelector(`.nav[data-page="${page}"]`)?.textContent.trim()||"Dashboard";$("sidebar").classList.remove("open");if(page==="checkin")populateFlightSelect("passengerFlight");if(page==="boarding")populateFlightSelect("boardingFlight");if(page==="cabin")populateFlightSelect("cabinFlight");if(page==="tracker")populateFlightSelect("trackerFlight")}
+document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>navigate(b.dataset.page)));
+document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>navigate(b.dataset.go)));
+$("menuToggle").addEventListener("click",()=>$("sidebar").classList.toggle("open"));
+$("loginForm").addEventListener("submit",async e=>{e.preventDefault();$("loginButton").disabled=true;msg("loginMessage","Signing in...");try{await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value)}catch(err){msg("loginMessage",err.message,"err")}finally{$("loginButton").disabled=false}});
+$("resetButton").addEventListener("click",async()=>{const email=$("email").value.trim();if(!email)return msg("loginMessage","Enter your email first.","err");try{await sendPasswordResetEmail(auth,email);msg("loginMessage","Password reset email sent.","ok")}catch(e){msg("loginMessage",e.message,"err")}});
+async function logout(){stopAllAudio();await signOut(auth);currentUser=null;showLogin()}
+$("logoutButton").addEventListener("click",logout);$("topLogoutButton").addEventListener("click",logout);
+async function loadWorkspace(user){const member=await getDoc(doc(db,"workspaces","main","members",user.uid));if(!member.exists())throw Error("This account is not a member of the workspace.");const data=member.data();if(!["owner","member"].includes(data.role))throw Error("Invalid workspace role.");const workspace=await getDoc(doc(db,"workspaces","main"));if(!workspace.exists())throw Error("Workspace document not found.");currentUser=user;currentRole=data.role;$("accountEmail").textContent=user.email;$("settingsEmail").textContent="Email: "+user.email;$("settingsRole").textContent="Role: "+data.role;$("userManagementInfo").textContent=`Signed in as ${user.email}. Workspace role: ${data.role}.`;showApp();await loadFlights()}
+onAuthStateChanged(auth,async user=>{if(!user){showLogin();return}try{await loadWorkspace(user)}catch(e){msg("loginMessage",e.message,"err");await signOut(auth)}});
+async function loadFlights(){try{const snap=await getDocs(query(collection(db,"workspaces","main","flights"),orderBy("createdAt","desc"),limit(100)));flights=snap.docs.map(d=>({id:d.id,...d.data()}));renderFlights();for(const id of ["passengerFlight","boardingFlight","cabinFlight","trackerFlight"])populateFlightSelect(id)}catch(e){msg("flightMessage","Could not load flights: "+e.message,"err")}}
+function renderFlights(){const rows=flights.map(f=>`<tr><td>${safe(f.flightNumber)}</td><td>${safe(f.airline)}</td><td>${safe(f.departure)} → ${safe(f.destination)}</td><td>${safe(f.aircraft)}</td></tr>`).join("");$("recentFlights").innerHTML=rows||'<tr><td colspan="4">No flights saved yet.</td></tr>';$("historyFlights").innerHTML=flights.map(f=>`<tr><td>${safe(f.flightNumber)}</td><td>${safe(f.airline)}</td><td>${safe(f.departure)} → ${safe(f.destination)}</td><td>${safe(f.flightDate)}</td><td>${safe(f.aircraft)}</td></tr>`).join("")||'<tr><td colspan="5">No history.</td></tr>';$("totalFlights").textContent=flights.length;$("activeFlight").textContent=flights.length?flights[0].flightNumber:"—"}
+function populateFlightSelect(id){const el=$(id);if(!el)return;const old=el.value;el.innerHTML='<option value="">Select a flight</option>'+flights.map(f=>`<option value="${safe(f.id)}">${safe(f.flightNumber)} — ${safe(f.departure)} to ${safe(f.destination)}</option>`).join("");if(flights.some(f=>f.id===old))el.value=old}
+$("flightForm").addEventListener("submit",async e=>{e.preventDefault();const btn=$("saveFlightButton");btn.disabled=true;const f={airline:$("airline").value.trim(),flightNumber:$("flightNumber").value.trim().toUpperCase(),departure:$("departure").value.trim().toUpperCase(),destination:$("destination").value.trim().toUpperCase(),aircraft:$("aircraft").value.trim(),flightDate:$("flightDate").value,departureTime:$("departureTime").value,captain:$("captain").value.trim(),createdBy:currentUser.uid,createdAt:serverTimestamp()};try{await addDoc(collection(db,"workspaces","main","flights"),f);msg("flightMessage","Flight saved successfully.","ok");$("flightForm").reset();await loadFlights()}catch(err){msg("flightMessage",err.message,"err")}finally{btn.disabled=false}});
+async function loadPassengers(flightId){if(!flightId){passengers=[];renderPassengers();return}const snap=await getDocs(query(collection(db,"workspaces","main","passengers"),where("flightId","==",flightId)));passengers=snap.docs.map(d=>({id:d.id,...d.data()}));$("totalPassengers").textContent=passengers.length;renderPassengers();renderBoarding()}
+function renderPassengers(){const flightId=$("passengerFlight").value;selectedCheckinFlight=flights.find(f=>f.id===flightId)||null;$("passengerFlightInfo").textContent=selectedCheckinFlight?`${selectedCheckinFlight.airline} | ${selectedCheckinFlight.flightNumber} | ${selectedCheckinFlight.departure} → ${selectedCheckinFlight.destination}`:"";$("seatMap").innerHTML="";if(!flightId){$("seatMap").textContent="Select a flight first.";return}const cols=["A","B","C","","D","E","F"];for(let r=1;r<=20;r++)for(const c of cols){if(!c){const gap=document.createElement("div");gap.className="aisle";$("seatMap").append(gap);continue}const seat=c+r,occupied=passengers.some(p=>p.seat===seat),b=document.createElement("button");b.type="button";b.className="seat"+(occupied?" occupied":"")+(selectedSeat===seat?" selected":"");b.textContent=seat;b.disabled=occupied;b.onclick=()=>{selectedSeat=seat;$("selectedSeatText").textContent="Selected seat: "+seat;renderPassengers()};$("seatMap").append(b)}$("selectedSeatText").textContent=selectedSeat?"Selected seat: "+selectedSeat:"No seat selected.";const body=$("passengerList");body.innerHTML=passengers.map(p=>`<tr><td>${safe(p.name)}</td><td>${safe(p.seat)}</td><td>${safe(p.group||"Group 1")}</td><td>${p.boarded?"Boarded":"Checked in"}</td><td><button class="secondary" data-pass="${safe(p.id)}">View</button></td></tr>`).join("")||'<tr><td colspan="5">No passengers registered.</td></tr>';body.querySelectorAll("[data-pass]").forEach(b=>b.onclick=()=>showPass(passengers.find(p=>p.id===b.dataset.pass)))}
+$("passengerFlight").addEventListener("change",async()=>{selectedSeat="";try{await loadPassengers($("passengerFlight").value)}catch(e){msg("passengerMessage",e.message,"err")}});
+$("passengerForm").addEventListener("submit",async e=>{e.preventDefault();const f=selectedCheckinFlight;if(!f)return msg("passengerMessage","Select a flight first.","err");if(!selectedSeat)return msg("passengerMessage","Select a seat first.","err");if(passengers.some(p=>p.seat===selectedSeat))return msg("passengerMessage","That seat is already occupied.","err");const btn=$("registerPassengerButton");btn.disabled=true;const p={name:$("passengerName").value.trim(),phone:$("passengerPhone").value.trim(),email:$("passengerEmail").value.trim(),seat:selectedSeat,group:$("passengerGroup").value,flightId:f.id,flightNumber:f.flightNumber,airline:f.airline,departure:f.departure,destination:f.destination,checkedIn:true,boarded:false,createdBy:currentUser.uid,createdAt:serverTimestamp()};try{const ref=await addDoc(collection(db,"workspaces","main","passengers"),p);selectedSeat="";$("passengerForm").reset();await loadPassengers(f.id);showPass({id:ref.id,...p});msg("passengerMessage","Passenger registered.","ok")}catch(err){msg("passengerMessage",err.message,"err")}finally{btn.disabled=false}});
+function showPass(p){$("bpName").textContent=p.name;$("bpFlight").textContent=p.flightNumber;$("bpRoute").textContent=`${p.departure} → ${p.destination}`;$("bpSeat").textContent=p.seat;$("boardingPass").classList.remove("hidden");$("boardingQR").innerHTML="";if(window.QRCode)new QRCode($("boardingQR"),{text:JSON.stringify({bookingId:p.id,flight:p.flightNumber,seat:p.seat}),width:110,height:110});$("boardingPass").scrollIntoView({behavior:"smooth"})}
+$("printPassButton").addEventListener("click",()=>{document.body.classList.add("printpass");window.print()});window.addEventListener("afterprint",()=>document.body.classList.remove("printpass"));
+$("boardingFlight").addEventListener("change",async()=>{try{await loadPassengers($("boardingFlight").value);renderBoarding()}catch(e){msg("boardingMessage",e.message,"err")}});
+function renderBoarding(){const list=$("boardingList");if(!list)return;const flightId=$("boardingFlight").value;if(!flightId){list.innerHTML='<tr><td colspan="5">Select a flight.</td></tr>';return}const f=flights.find(x=>x.id===flightId);$("boardingInfo").textContent=f?`${f.airline} | ${f.flightNumber} | ${f.departure} → ${f.destination}`:"";const boarded=passengers.filter(p=>p.boarded).length;$("boardRegistered").textContent=passengers.length;$("boardCount").textContent=boarded;$("boardRemaining").textContent=passengers.length-boarded;list.innerHTML=passengers.map(p=>`<tr><td>${safe(p.name)}</td><td>${safe(p.seat)}</td><td>${safe(p.group||"Group 1")}</td><td>${p.boarded?"Boarded":"Waiting"}</td><td>${p.boarded?"—":`<button class="secondary" data-board="${safe(p.id)}">Mark boarded</button>`}</td></tr>`).join("")||'<tr><td colspan="5">No passengers for this flight.</td></tr>';list.querySelectorAll("[data-board]").forEach(b=>b.onclick=async()=>{try{await updateDoc(doc(db,"workspaces","main","passengers",b.dataset.board),{boarded:true,boardedAt:serverTimestamp()});await loadPassengers(flightId)}catch(e){msg("boardingMessage",e.message,"err")}})}
+document.querySelectorAll("[data-board-audio]").forEach(b=>b.addEventListener("click",()=>playAnnouncement("airport",b.dataset.boardAudio)));
+$("cabinFlight").addEventListener("change",()=>{const f=flights.find(x=>x.id===$("cabinFlight").value);$("cabinFlightInfo").textContent=f?`${f.airline} | ${f.flightNumber} | ${f.departure} → ${f.destination}`:""});
+$("setPhaseButton").addEventListener("click",()=>{$("currentPhase").textContent=$("phaseSelect").value;msg("audioMessage","Flight phase updated: "+$("phaseSelect").value,"ok")});
+document.querySelectorAll("[data-cabin-audio]").forEach(b=>b.addEventListener("click",()=>playAnnouncement("cabin",b.dataset.cabinAudio)));
+document.querySelectorAll("[data-captain-audio]").forEach(b=>b.addEventListener("click",()=>playAnnouncement("captain",b.dataset.captainAudio)));
+$("saveTelemetryButton").addEventListener("click",()=>{$("trackerAltitude").textContent=$("manualAltitude").value?Number($("manualAltitude").value).toLocaleString()+" ft":"—";$("trackerSpeed").textContent=$("manualSpeed").value?$("manualSpeed").value+" kt":"—";$("trackerHeading").textContent=$("manualHeading").value?$("manualHeading").value+"°":"—";$("trackerPhase").textContent=$("manualTrackerPhase").value||"—";$("trackerStatus").textContent="Manual display only";$("trackerStatus").className="gold"});
+function findFile(id){for(const [folder,arr] of Object.entries(files))for(const [file,label] of arr)if(file===id)return{folder,file,label};return null}
+function stopMusic(){if(musicAudio){musicAudio.pause();musicAudio.currentTime=0;musicAudio=null}}
+function stopAllAudio(){playToken++;if(currentAnnouncement){currentAnnouncement.pause();currentAnnouncement=null}stopMusic();$("audioStatus").textContent="Stopped"}
+function playMusic(file){stopAllAudio();musicAudio=new Audio(path("music",file));musicAudio.loop=true;musicAudio.volume=.45;musicAudio.play().then(()=>$("audioStatus").textContent="Music playing").catch(e=>msg("audioMessage","Could not play "+file+". Check the GitHub file path. "+e.message,"err"))}
+async function playAnnouncement(folder,file){const entry=findFile(file);if(!entry)return;const token=++playToken;const wasMusic=!!musicAudio&&!musicAudio.paused;const musicFile=musicAudio?musicAudio.src.split("/").pop().replace(".mp3",""):null;if(musicAudio)musicAudio.pause();if(currentAnnouncement){currentAnnouncement.pause();currentAnnouncement=null}const isAirport=folder==="airport",isCabin=folder==="cabin",isCaptain=folder==="captain";const chime=isAirport?"33_airport_pa_chime":isCabin?"34_cabin_announcement_chime":null;try{if(chime)await playOne("effects",chime,token);if(token!==playToken)return;if(chime)await new Promise(r=>setTimeout(r,2000));if(token!==playToken)return;await playOne(folder,file,token);if(token!==playToken)return;if(isCaptain)await playOne("effects","35_captain_radio_end",token);$("audioStatus").textContent="Ready"}catch(e){if(token===playToken)msg("audioMessage","Audio could not play: "+e.message,"err")}finally{if(token===playToken&&wasMusic&&musicFile){musicAudio=new Audio(path("music",musicFile));musicAudio.loop=true;musicAudio.volume=.45;musicAudio.play().catch(()=>{})}}}
+function playOne(folder,file,token){return new Promise((resolve,reject)=>{const a=new Audio(path(folder,file));currentAnnouncement=a;$("audioStatus").textContent="Playing "+file;a.onended=()=>{if(token===playToken){currentAnnouncement=null;resolve()}else resolve()};a.onerror=()=>reject(Error("Missing file: "+path(folder,file)));a.play().catch(reject)})}
+function renderAudioList(target,folder){$(target).innerHTML=files[folder].map(([file,label])=>`<div class="audioitem"><span>${safe(label)} <small class="muted">${safe(file)}.mp3</small></span><button class="secondary" data-play="${safe(file)}">Play</button></div>`).join("");$(target).querySelectorAll("[data-play]").forEach(b=>b.addEventListener("click",()=>playAnnouncement(folder,b.dataset.play)))}
+renderAudioList("airportAudioList","airport");renderAudioList("cabinAudioList","cabin");renderAudioList("captainAudioList","captain");renderAudioList("effectsAudioList","effects");
+$("playBoardingMusic").addEventListener("click",()=>playMusic("31_boarding_music"));$("playLoungeMusic").addEventListener("click",()=>playMusic("32_lounge_music"));$("stopAudio").addEventListener("click",stopAllAudio);$("settingsStopAudio").addEventListener("click",stopAllAudio);
 </script>
 </body>
 </html>
