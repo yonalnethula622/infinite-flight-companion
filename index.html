@@ -1,0 +1,496 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#071521">
+  <title>Infinite Flight Companion</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #071521;
+      color: #ffffff;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 250px;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      background: #0d202e;
+      padding: 28px 18px;
+      border-right: 1px solid #203544;
+    }
+
+    .logo {
+      font-size: 19px;
+      font-weight: bold;
+      margin-bottom: 45px;
+      color: #e4b65b;
+    }
+
+    .logo span {
+      display: block;
+      font-size: 10px;
+      color: #9aabb6;
+      letter-spacing: 3px;
+      margin-top: 7px;
+    }
+
+    .nav-title {
+      color: #708593;
+      font-size: 10px;
+      letter-spacing: 2px;
+      margin: 25px 12px 12px;
+    }
+
+    .nav-item {
+      padding: 13px 14px;
+      margin: 5px 0;
+      border-radius: 8px;
+      color: #aabac5;
+      cursor: pointer;
+      font-size: 14px;
+      transition: .2s;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      background: #183a48;
+      color: #e4b65b;
+    }
+
+    main {
+      margin-left: 250px;
+      padding: 35px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 38px;
+      gap: 15px;
+    }
+
+    .topbar h1 {
+      font-size: 26px;
+      font-weight: 500;
+    }
+
+    .connection {
+      background: #172e38;
+      border: 1px solid #31504e;
+      padding: 10px 15px;
+      border-radius: 30px;
+      color: #b5c9bd;
+      font-size: 12px;
+    }
+
+    .welcome {
+      margin-bottom: 30px;
+    }
+
+    .welcome h2 {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+
+    .welcome p {
+      color: #8da0ad;
+      font-size: 14px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .card {
+      background: #102431;
+      border: 1px solid #213947;
+      border-radius: 13px;
+      padding: 22px;
+    }
+
+    .card-label {
+      font-size: 12px;
+      color: #8da0ad;
+      margin-bottom: 15px;
+    }
+
+    .card-value {
+      font-size: 23px;
+      color: #e4b65b;
+      font-weight: bold;
+    }
+
+    .section-title {
+      font-size: 18px;
+      margin-bottom: 18px;
+    }
+
+    .flight-card {
+      background: linear-gradient(120deg, #143746, #102431);
+      border: 1px solid #31505a;
+      border-radius: 15px;
+      padding: 28px;
+      margin-bottom: 25px;
+    }
+
+    .flight-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      gap: 10px;
+    }
+
+    .flight-number {
+      color: #e4b65b;
+      font-size: 13px;
+    }
+
+    .status {
+      font-size: 11px;
+      background: #294b45;
+      color: #a9d7bc;
+      padding: 7px 12px;
+      border-radius: 20px;
+    }
+
+    .route {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .airport-code {
+      font-size: 36px;
+      font-weight: bold;
+    }
+
+    .airport-name {
+      color: #9aabb6;
+      font-size: 12px;
+      margin-top: 7px;
+    }
+
+    .route-line {
+      flex: 1;
+      text-align: center;
+      color: #e4b65b;
+      font-size: 12px;
+    }
+
+    .route-line span {
+      display: block;
+      font-size: 25px;
+      margin: 5px 0;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .action-card {
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .action-card:hover {
+      border-color: #d9aa50;
+      transform: translateY(-3px);
+    }
+
+    .action-icon {
+      font-size: 25px;
+      margin-bottom: 16px;
+    }
+
+    .action-card h3 {
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .action-card p {
+      color: #8da0ad;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .placeholder {
+      margin-top: 20px;
+      color: #9aabb6;
+      line-height: 1.8;
+    }
+
+    button {
+      background: #d9aa50;
+      color: #071521;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 7px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    @media(max-width: 850px) {
+      .sidebar {
+        width: 70px;
+        padding: 20px 8px;
+      }
+
+      .logo {
+        font-size: 10px;
+        text-align: center;
+      }
+
+      .logo span,
+      .nav-title,
+      .nav-item span {
+        display: none;
+      }
+
+      .nav-item {
+        text-align: center;
+        padding: 14px 5px;
+        font-size: 19px;
+      }
+
+      main {
+        margin-left: 70px;
+        padding: 22px;
+      }
+
+      .stats,
+      .actions {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media(max-width: 500px) {
+      main {
+        padding: 16px;
+      }
+
+      .topbar h1 {
+        font-size: 19px;
+      }
+
+      .welcome h2 {
+        font-size: 23px;
+      }
+
+      .route {
+        flex-wrap: wrap;
+      }
+
+      .airport-code {
+        font-size: 27px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <aside class="sidebar">
+    <div class="logo">
+      ✈ INFINITE FLIGHT
+      <span>COMPANION</span>
+    </div>
+
+    <div class="nav-title">MAIN MENU</div>
+
+    <div class="nav-item active" onclick="showPage('dashboard',this)">⌂ <span>Dashboard</span></div>
+    <div class="nav-item" onclick="showPage('setup',this)">✈ <span>Flight Setup</span></div>
+    <div class="nav-item" onclick="showPage('checkin',this)">▣ <span>Check-in</span></div>
+    <div class="nav-item" onclick="showPage('boarding',this)">♙ <span>Boarding</span></div>
+    <div class="nav-item" onclick="showPage('cabin',this)">▤ <span>Cabin Experience</span></div>
+
+    <div class="nav-title">FLIGHT</div>
+
+    <div class="nav-item" onclick="showPage('tracker',this)">◎ <span>Live Tracker</span></div>
+    <div class="nav-item" onclick="showPage('audio',this)">♫ <span>Audio Centre</span></div>
+    <div class="nav-item" onclick="showPage('history',this)">◷ <span>Flight History</span></div>
+  </aside>
+
+  <main>
+
+    <div class="topbar">
+      <h1 id="pageTitle">Dashboard</h1>
+      <div class="connection">● Simulator Not Connected</div>
+    </div>
+
+    <section id="dashboard" class="page active">
+      <div class="welcome">
+        <h2>Welcome Aboard</h2>
+        <p>Your personal airline passenger experience starts here.</p>
+      </div>
+
+      <div class="stats">
+        <div class="card">
+          <div class="card-label">SIMULATOR STATUS</div>
+          <div class="card-value">Offline</div>
+        </div>
+        <div class="card">
+          <div class="card-label">CURRENT FLIGHT</div>
+          <div class="card-value">Not Set</div>
+        </div>
+        <div class="card">
+          <div class="card-label">FLIGHT PHASE</div>
+          <div class="card-value">Ground</div>
+        </div>
+      </div>
+
+      <h3 class="section-title">Flight Overview</h3>
+
+      <div class="flight-card">
+        <div class="flight-header">
+          <div class="flight-number">YOUR NEXT JOURNEY</div>
+          <div class="status">Awaiting Setup</div>
+        </div>
+
+        <div class="route">
+          <div>
+            <div class="airport-code">---</div>
+            <div class="airport-name">Departure</div>
+          </div>
+
+          <div class="route-line">
+            ✈
+            <span>━━━━━━━━</span>
+            ROUTE
+          </div>
+
+          <div>
+            <div class="airport-code">---</div>
+            <div class="airport-name">Destination</div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-title">Quick Access</h3>
+
+      <div class="actions">
+        <div class="card action-card" onclick="showPage('setup')">
+          <div class="action-icon">✈</div>
+          <h3>Set Up Flight</h3>
+          <p>Choose your airline, aircraft and destination.</p>
+        </div>
+
+        <div class="card action-card" onclick="showPage('checkin')">
+          <div class="action-icon">▣</div>
+          <h3>Passenger Check-in</h3>
+          <p>Register passengers and prepare boarding passes.</p>
+        </div>
+
+        <div class="card action-card" onclick="showPage('tracker')">
+          <div class="action-icon">◎</div>
+          <h3>Flight Tracker</h3>
+          <p>View your live aircraft position and flight progress.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="setup" class="page">
+      <h2>Flight Setup</h2>
+      <p class="placeholder">Configure your airline, flight number, departure airport, destination and aircraft here.</p>
+    </section>
+
+    <section id="checkin" class="page">
+      <h2>Passenger Check-in</h2>
+      <p class="placeholder">Passenger registration, seat selection and boarding passes will be available here.</p>
+    </section>
+
+    <section id="boarding" class="page">
+      <h2>Airport Boarding</h2>
+      <p class="placeholder">Priority boarding, boarding groups, final call and gate closing.</p>
+    </section>
+
+    <section id="cabin" class="page">
+      <h2>Aircraft Cabin</h2>
+      <p class="placeholder">Cabin crew announcements, captain announcements and cabin relaxation music.</p>
+    </section>
+
+    <section id="tracker" class="page">
+      <h2>Live Flight Tracker</h2>
+      <p class="placeholder">Your aircraft's real-time position and satellite map will appear here.</p>
+    </section>
+
+    <section id="audio" class="page">
+      <h2>Audio Centre</h2>
+      <p class="placeholder">Manage airport announcements, cabin announcements, radio effects and background music.</p>
+    </section>
+
+    <section id="history" class="page">
+      <h2>Flight History</h2>
+      <p class="placeholder">Your completed flights will appear here.</p>
+    </section>
+
+  </main>
+
+  <script>
+    function showPage(pageId, element) {
+      document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+      });
+
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+
+      document.getElementById(pageId).classList.add('active');
+
+      if (element) {
+        element.classList.add('active');
+      } else {
+        document.querySelectorAll('.nav-item').forEach(item => {
+          if (item.getAttribute('onclick')?.includes("'" + pageId + "'")) {
+            item.classList.add('active');
+          }
+        });
+      }
+
+      const titles = {
+        dashboard: 'Dashboard',
+        setup: 'Flight Setup',
+        checkin: 'Passenger Check-in',
+        boarding: 'Airport Boarding',
+        cabin: 'Aircraft Cabin',
+        tracker: 'Live Flight Tracker',
+        audio: 'Audio Centre',
+        history: 'Flight History'
+      };
+
+      document.getElementById('pageTitle').textContent = titles[pageId];
+    }
+  </script>
+
+</body>
+</html>
