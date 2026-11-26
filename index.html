@@ -126,6 +126,113 @@ th{color:var(--muted);font-weight:normal}
  .stat-value{font-size:23px}
  .quick-grid{grid-template-columns:1fr}
 }
+  
+.seat-legend {
+  display:flex;
+  flex-wrap:wrap;
+  gap:18px;
+  margin:18px 0;
+  font-size:12px;
+  color:var(--muted);
+}
+.seat-legend span {
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+.seat-dot {
+  display:inline-block;
+  width:12px;
+  height:12px;
+  border-radius:3px;
+  background:#263b52;
+}
+.seat-dot.available {background:#304b68}
+.seat-dot.selected {background:var(--gold)}
+.seat-dot.occupied {background:#a94d53}
+
+.seat-map {
+  display:grid;
+  grid-template-columns:repeat(7, minmax(30px, 44px));
+  gap:8px;
+  justify-content:center;
+  padding:20px 5px;
+  margin-top:12px;
+  background:#0b1929;
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow-x:auto;
+}
+.seat {
+  min-height:38px;
+  border:1px solid #40556d;
+  background:#20364d;
+  color:white;
+  border-radius:7px;
+  font-size:12px;
+}
+.seat:hover:not(:disabled) {border-color:var(--gold)}
+.seat.selected {background:var(--gold);color:#101827;border-color:var(--gold)}
+.seat.occupied {background:#753b43;color:#fff;border-color:#753b43}
+.seat:disabled {cursor:not-allowed;opacity:.8}
+.aisle {width:12px}
+.gold-text {color:var(--gold)}
+
+.boarding-pass {
+  max-width:650px;
+  margin:22px auto;
+  padding:22px;
+  background:#f7f7f3;
+  color:#172437;
+  border-radius:14px;
+}
+.boarding-pass-header {
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  border-bottom:2px solid #d9ad58;
+  padding-bottom:15px;
+  font-size:13px;
+}
+.boarding-pass-body {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  padding:15px 0;
+}
+.boarding-pass-body h2,
+.boarding-pass-body h3 {margin:5px 0 13px;color:#172437}
+.boarding-pass-body .muted {color:#64748b;font-size:10px;margin-bottom:3px}
+.boarding-pass-footer {
+  border-top:1px dashed #aab3bf;
+  padding-top:14px;
+  font-size:12px;
+}
+#boardingQR img {max-width:130px}
+.boarding-pass button {margin-top:12px}
+
+@media(max-width:450px) {
+  .boarding-pass-body {flex-direction:column;align-items:flex-start}
+}
+
+@media print {
+  body.print-pass * {visibility:hidden!important}
+  body.print-pass #boardingPass,
+  body.print-pass #boardingPass * {visibility:visible!important}
+  body.print-pass #boardingPass {
+    display:block!important;
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    max-width:none;
+    margin:0;
+    box-shadow:none;
+  }
+  body.print-pass #boardingPass button {display:none!important}
+}
+
 </style>
 </head>
 
