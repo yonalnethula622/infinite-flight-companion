@@ -2,321 +2,543 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#07111f">
-  <title>Infinite Flight Companion</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#091321">
+<title>Infinite Flight Companion</title>
 
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #07111f;
-      color: #f4f6fa;
-    }
-
-    button, input { font: inherit; }
-
-    .container {
-      width: min(440px, 92%);
-      margin: 70px auto;
-    }
-
-    .panel {
-      background: #101e30;
-      border: 1px solid #26364a;
-      border-radius: 16px;
-      padding: 25px;
-    }
-
-    h1 { font-size: 25px; margin-top: 0; }
-    h2 { font-size: 20px; }
-
-    .muted { color: #a8b6c9; line-height: 1.6; }
-
-    input {
-      width: 100%;
-      padding: 14px;
-      margin: 8px 0;
-      border: 1px solid #35465c;
-      border-radius: 8px;
-      background: #091625;
-      color: white;
-    }
-
-    button {
-      padding: 13px 18px;
-      border: 0;
-      border-radius: 8px;
-      background: #d7a747;
-      color: #111827;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:disabled { opacity: .6; cursor: wait; }
-
-    .primary { width: 100%; margin-top: 12px; }
-
-    .error { color: #ff8585; }
-    .success { color: #79dca5; }
-
-    .hidden { display: none !important; }
-
-    header {
-      padding: 18px 5%;
-      border-bottom: 1px solid #26364a;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 15px;
-    }
-
-    header h2 { margin: 0; font-size: 18px; }
-
-    main {
-      width: min(1100px, 92%);
-      margin: 35px auto;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-top: 25px;
-    }
-
-    .feature {
-      background: #101e30;
-      border: 1px solid #26364a;
-      border-radius: 12px;
-      padding: 22px;
-    }
-
-    .feature h3 { margin-top: 0; color: #e3b653; }
-
-    #message { min-height: 22px; margin-top: 12px; }
-  </style>
+<style>
+:root {
+  --bg:#091321;
+  --sidebar:#0d1a2a;
+  --panel:#122237;
+  --panel2:#182b42;
+  --border:#263b52;
+  --gold:#d9ad58;
+  --text:#f3f5f8;
+  --muted:#9aabc0;
+  --green:#45c58a;
+  --red:#ed7777;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+#loginPage{max-width:420px;margin:70px auto;padding:20px}
+.login-card{background:var(--panel);padding:30px;border:1px solid var(--border);border-radius:16px}
+input,select{
+  width:100%;padding:13px;margin:7px 0 15px;
+  background:#091625;color:white;border:1px solid var(--border);
+  border-radius:8px;outline:none
+}
+input:focus,select:focus{border-color:var(--gold)}
+label{font-size:13px;color:var(--muted)}
+button.primary{background:var(--gold);color:#101827;border:0;border-radius:8px;padding:13px 18px;font-weight:bold}
+button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:11px 15px}
+button:disabled{opacity:.5;cursor:not-allowed}
+.full{width:100%}
+.error{color:var(--red);font-size:13px}
+.success{color:var(--green);font-size:13px}
+.muted{color:var(--muted)}
+#app{min-height:100vh}
+.sidebar{
+  position:fixed;left:0;top:0;bottom:0;width:245px;
+  background:var(--sidebar);border-right:1px solid var(--border);
+  padding:22px 14px;display:flex;flex-direction:column;z-index:10;
+  transition:transform .25s
+}
+.brand{display:flex;align-items:center;gap:12px;padding:5px 10px 24px;border-bottom:1px solid var(--border)}
+.brand-icon{font-size:28px;color:var(--gold)}
+.brand strong{font-size:14px;line-height:1.4}
+.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:1px}
+.nav-label{font-size:10px;letter-spacing:1.5px;color:#73869d;padding:22px 12px 9px}
+.nav-button{
+  display:flex;align-items:center;gap:13px;width:100%;
+  padding:12px;border:0;background:transparent;color:#aebdd0;
+  border-radius:8px;text-align:left;margin:2px 0;font-size:14px
+}
+.nav-button:hover{background:var(--panel2);color:white}
+.nav-button.active{background:#25364b;color:var(--gold);font-weight:bold}
+.nav-icon{width:22px;text-align:center;font-size:17px}
+.sidebar-bottom{margin-top:auto;border-top:1px solid var(--border);padding-top:15px}
+.account{padding:10px;color:var(--muted);font-size:12px;overflow-wrap:anywhere}
+.main{margin-left:245px;min-height:100vh}
+.topbar{
+  height:70px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 30px;background:#0b1726;position:sticky;top:0;z-index:5
+}
+.topbar-title{font-size:17px;font-weight:bold}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.status{font-size:12px;color:var(--green)}
+.menu-toggle{display:none;background:transparent;color:white;border:0;font-size:24px}
+.content{padding:30px;max-width:1450px;margin:auto}
+.page{display:none}
+.page.active{display:block}
+.page-heading{margin-bottom:25px}
+.page-heading h1{font-size:27px;margin:0 0 8px}
+.page-heading p{color:var(--muted);margin:0;font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px}
+.stat-label{font-size:12px;color:var(--muted)}
+.stat-value{font-size:28px;font-weight:bold;margin:12px 0 5px}
+.stat-icon{font-size:22px;color:var(--gold);float:right}
+.section-title{font-size:17px;margin:28px 0 14px}
+.quick-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.quick-action{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:12px;padding:20px;color:white;text-align:left;
+  transition:.2s
+}
+.quick-action:hover{border-color:var(--gold);transform:translateY(-2px)}
+.quick-action span{font-size:24px;display:block;margin-bottom:12px}
+.quick-action strong{display:block;margin-bottom:6px}
+.quick-action small{color:var(--muted);line-height:1.5}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 18px}
+.form-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:500px}
+th,td{text-align:left;padding:13px;border-bottom:1px solid var(--border);font-size:13px}
+th{color:var(--muted);font-weight:normal}
+.empty{text-align:center;color:var(--muted);padding:35px 10px}
+.notice{padding:14px;background:#192b40;border:1px solid var(--border);border-radius:9px;color:var(--muted);font-size:13px;line-height:1.6}
+.page-message{font-size:13px;margin-top:12px}
+.mobile-overlay{display:none}
+@media(max-width:1050px){
+ .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:700px){
+ .sidebar{transform:translateX(-100%)}
+ .sidebar.open{transform:translateX(0)}
+ .main{margin-left:0}
+ .menu-toggle{display:block}
+ .topbar{padding:0 15px}
+ .content{padding:20px 15px}
+ .quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .form-grid{grid-template-columns:1fr}
+ .mobile-overlay.show{display:block;position:fixed;inset:0;background:#0009;z-index:8}
+ .topbar-title{font-size:14px}
+}
+@media(max-width:420px){
+ .grid{grid-template-columns:1fr 1fr;gap:9px}
+ .card{padding:14px}
+ .stat-value{font-size:23px}
+ .quick-grid{grid-template-columns:1fr}
+}
+</style>
 </head>
 
 <body>
 
-  <section id="loginPage" class="container">
-    <div class="panel">
-      <h1>✈ Infinite Flight Companion</h1>
-      <p class="muted">Sign in to access your flight companion workspace.</p>
+<section id="loginPage">
+  <div class="login-card">
+    <h1>✈ Infinite Flight Companion</h1>
+    <p class="muted">Sign in to your flight operations workspace.</p>
+    <form id="loginForm">
+      <label>Email address</label>
+      <input id="email" type="email" required autocomplete="username">
+      <label>Password</label>
+      <input id="password" type="password" required autocomplete="current-password">
+      <button class="primary full" id="loginButton">Sign In</button>
+    </form>
+    <p id="loginMessage" class="page-message"></p>
+    <button class="secondary full" id="resetButton">Forgot password?</button>
+  </div>
+</section>
 
-      <form id="loginForm">
-        <input
-          id="email"
-          type="email"
-          placeholder="Email address"
-          autocomplete="username"
-          required
-        >
+<div id="app" class="hidden">
+  <div class="mobile-overlay" id="overlay"></div>
 
-        <input
-          id="password"
-          type="password"
-          placeholder="Password"
-          autocomplete="current-password"
-          required
-        >
-
-        <button class="primary" id="loginButton" type="submit">
-          Sign In
-        </button>
-      </form>
-
-      <p id="message" aria-live="polite"></p>
-      <button id="resetButton" type="button">
-        Reset Password
-      </button>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-icon">✈</div>
+      <div><strong>INFINITE FLIGHT<br>COMPANION</strong><small>FLIGHT EXPERIENCE SYSTEM</small></div>
     </div>
-  </section>
 
-  <section id="dashboardPage" class="hidden">
-    <header>
-      <h2>✈ Infinite Flight Companion</h2>
-      <button id="logoutButton">Logout</button>
+    <div class="nav-label">MAIN MENU</div>
+    <button class="nav-button active" data-page="dashboard"><span class="nav-icon">▦</span>Dashboard</button>
+    <button class="nav-button" data-page="flightSetup"><span class="nav-icon">✈</span>Flight Setup</button>
+    <button class="nav-button" data-page="checkin"><span class="nav-icon">▣</span>Passenger Check-in</button>
+    <button class="nav-button" data-page="boarding"><span class="nav-icon">♧</span>Boarding</button>
+
+    <div class="nav-label">FLIGHT EXPERIENCE</div>
+    <button class="nav-button" data-page="cabin"><span class="nav-icon">◉</span>Cabin Experience</button>
+    <button class="nav-button" data-page="tracker"><span class="nav-icon">⌖</span>Live Tracker</button>
+    <button class="nav-button" data-page="audio"><span class="nav-icon">♫</span>Audio Centre</button>
+
+    <div class="nav-label">MANAGEMENT</div>
+    <button class="nav-button" data-page="history"><span class="nav-icon">◷</span>Flight History</button>
+    <button class="nav-button" data-page="users"><span class="nav-icon">♙</span>User Management</button>
+    <button class="nav-button" data-page="settings"><span class="nav-icon">⚙</span>Settings</button>
+
+    <div class="sidebar-bottom">
+      <div class="account" id="accountEmail">Signed in</div>
+      <button class="nav-button" id="logoutButton"><span class="nav-icon">⇥</span>Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:13px">
+        <button class="menu-toggle" id="menuToggle">☰</button>
+        <div class="topbar-title" id="topTitle">Dashboard</div>
+      </div>
+      <div class="topbar-right">
+        <span class="status">● Workspace connected</span>
+      </div>
     </header>
 
-    <main>
-      <h1>Welcome to your flight workspace</h1>
-      <p class="muted" id="accountInfo"></p>
+    <div class="content">
 
-      <div class="grid">
-        <div class="feature">
-          <h3>Flight Setup</h3>
-          <p class="muted">Prepare your airline, flight number, route and aircraft.</p>
+      <section class="page active" id="page-dashboard">
+        <div class="page-heading">
+          <h1>Flight Operations Dashboard</h1>
+          <p>Welcome to your Infinite Flight Companion workspace.</p>
         </div>
 
-        <div class="feature">
-          <h3>Passenger Check-in</h3>
-          <p class="muted">Prepare passenger check-in and boarding passes.</p>
+        <div class="grid">
+          <div class="card"><span class="stat-icon">✈</span><div class="stat-label">Total Flights</div><div class="stat-value" id="totalFlights">0</div><div class="muted">Saved flights</div></div>
+          <div class="card"><span class="stat-icon">◉</span><div class="stat-label">Active Flight</div><div class="stat-value" id="activeFlight">0</div><div class="muted">Currently selected</div></div>
+          <div class="card"><span class="stat-icon">♙</span><div class="stat-label">Passengers</div><div class="stat-value">—</div><div class="muted">Coming soon</div></div>
+          <div class="card"><span class="stat-icon">♫</span><div class="stat-label">Audio System</div><div class="stat-value">Ready</div><div class="muted">Audio controls coming soon</div></div>
         </div>
 
-        <div class="feature">
-          <h3>Boarding</h3>
-          <p class="muted">Manage boarding groups and announcements.</p>
+        <h2 class="section-title">Quick Actions</h2>
+        <div class="quick-grid">
+          <button class="quick-action" data-go="flightSetup"><span>✈</span><strong>Create Flight</strong><small>Set airline, route and aircraft details.</small></button>
+          <button class="quick-action" data-go="checkin"><span>▣</span><strong>Passenger Check-in</strong><small>Open the passenger check-in section.</small></button>
+          <button class="quick-action" data-go="boarding"><span>♧</span><strong>Start Boarding</strong><small>Open boarding management.</small></button>
+          <button class="quick-action" data-go="audio"><span>♫</span><strong>Audio Centre</strong><small>Open announcement and sound controls.</small></button>
+          <button class="quick-action" data-go="tracker"><span>⌖</span><strong>Live Tracker</strong><small>Open the simulator tracking section.</small></button>
+          <button class="quick-action" data-go="history"><span>◷</span><strong>Flight History</strong><small>View saved flight records.</small></button>
         </div>
 
-        <div class="feature">
-          <h3>Cabin Experience</h3>
-          <p class="muted">Manage cabin announcements and audio.</p>
+        <h2 class="section-title">Recent Flights</h2>
+        <div class="card table-wrap">
+          <table>
+            <thead><tr><th>Flight</th><th>Airline</th><th>Route</th><th>Aircraft</th></tr></thead>
+            <tbody id="recentFlights"><tr><td colspan="4" class="empty">No flights saved yet. Create your first flight.</td></tr></tbody>
+          </table>
         </div>
+      </section>
 
-        <div class="feature">
-          <h3>Live Tracker</h3>
-          <p class="muted">Connect to Infinite Flight telemetry.</p>
+      <section class="page" id="page-flightSetup">
+        <div class="page-heading">
+          <h1>Flight Setup</h1>
+          <p>Create and save your flight information to Firebase.</p>
         </div>
-
-        <div class="feature">
-          <h3>Audio Centre</h3>
-          <p class="muted">Manage airport and aircraft announcements.</p>
+        <div class="card">
+          <form id="flightForm">
+            <div class="form-grid">
+              <div><label>Airline name</label><input id="airline" placeholder="Example: SriLankan Airlines" required></div>
+              <div><label>Flight number</label><input id="flightNumber" placeholder="Example: UL 225" required></div>
+              <div><label>Departure airport (IATA)</label><input id="departure" placeholder="Example: DXB" maxlength="4" required></div>
+              <div><label>Destination airport (IATA)</label><input id="destination" placeholder="Example: CMB" maxlength="4" required></div>
+              <div><label>Aircraft</label><input id="aircraft" placeholder="Example: Airbus A330-300" required></div>
+              <div><label>Flight date</label><input id="flightDate" type="date" required></div>
+              <div><label>Scheduled departure time</label><input id="departureTime" type="time"></div>
+              <div><label>Captain name (optional)</label><input id="captain" placeholder="Captain name"></div>
+            </div>
+            <div class="form-actions">
+              <button class="primary" id="saveFlightButton">Save Flight</button>
+              <button class="secondary" type="reset">Clear Form</button>
+            </div>
+            <p id="flightMessage" class="page-message"></p>
+          </form>
         </div>
-      </div>
-    </main>
-  </section>
+      </section>
 
-  <script type="module">
-    import { initializeApp } from
-      "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+      <section class="page" id="page-checkin">
+        <div class="page-heading"><h1>Passenger Check-in</h1><p>Passenger registration and check-in management.</p></div>
+        <div class="notice">This section is planned for passenger details, seat selection, check-in status and boarding pass creation. The passenger system will be connected to your selected flight in the next development stage.</div>
+      </section>
 
-    import {
-      getAuth,
-      signInWithEmailAndPassword,
-      onAuthStateChanged,
-      signOut,
-      sendPasswordResetEmail
-    } from
-      "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
+      <section class="page" id="page-boarding">
+        <div class="page-heading"><h1>Boarding Management</h1><p>Manage passenger boarding and airport announcements.</p></div>
+        <div class="notice">This section will include boarding groups, priority boarding, final calls, boarding complete and automated airport announcements.</div>
+      </section>
 
-    import {
-      getFirestore,
-      doc,
-      getDoc
-    } from
-      "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
+      <section class="page" id="page-cabin">
+        <div class="page-heading"><h1>Cabin Experience</h1><p>Manage the passenger experience inside the aircraft.</p></div>
+        <div class="notice">This section will include cabin crew announcements, captain announcements, flight phases, chimes and cabin relaxation music.</div>
+      </section>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDQgKie9EHcjG81IWxez_vxPue4zfFnZbk",
-      authDomain: "infinite-flight-companion.firebaseapp.com",
-      projectId: "infinite-flight-companion",
-      storageBucket: "infinite-flight-companion.firebasestorage.app",
-      messagingSenderId: "208265827432",
-      appId: "1:208265827432:web:72d8d6d7e2ce38ec1017dd"
-    };
+      <section class="page" id="page-tracker">
+        <div class="page-heading"><h1>Live Flight Tracker</h1><p>Simulator connection and live aircraft information.</p></div>
+        <div class="notice">The live tracker requires the Infinite Flight Connect API and a local bridge running on the computer with Infinite Flight. Firebase alone cannot read simulator telemetry.</div>
+      </section>
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+      <section class="page" id="page-audio">
+        <div class="page-heading"><h1>Audio Centre</h1><p>Manage airport, cabin and captain announcement audio.</p></div>
+        <div class="notice">Your existing MP3 files and sound effects will be organised here. We'll add the chime → 2-second pause → announcement sequence, radio effects, audio queue and background music controls.</div>
+      </section>
 
-    const loginPage = document.getElementById("loginPage");
-    const dashboardPage = document.getElementById("dashboardPage");
-    const loginForm = document.getElementById("loginForm");
-    const loginButton = document.getElementById("loginButton");
-    const message = document.getElementById("message");
+      <section class="page" id="page-history">
+        <div class="page-heading"><h1>Flight History</h1><p>Review your saved flight information.</p></div>
+        <div class="card table-wrap">
+          <table>
+            <thead><tr><th>Flight</th><th>Airline</th><th>Route</th><th>Date</th><th>Aircraft</th></tr></thead>
+            <tbody id="historyFlights"><tr><td colspan="5" class="empty">No flight history yet.</td></tr></tbody>
+          </table>
+        </div>
+      </section>
 
-    function showMessage(text, type = "error") {
-      message.textContent = text;
-      message.className = type;
-    }
+      <section class="page" id="page-users">
+        <div class="page-heading"><h1>User Management</h1><p>Manage access to your shared workspace.</p></div>
+        <div class="notice">Your account is the workspace owner. We'll build secure invitations, member roles and access management here. For now, do not create member accounts through an ordinary public registration form.</div>
+      </section>
 
-    async function checkWorkspace(user) {
-      const memberRef = doc(
-        db, "workspaces", "main", "members", user.uid
-      );
+      <section class="page" id="page-settings">
+        <div class="page-heading"><h1>Settings</h1><p>Account and application information.</p></div>
+        <div class="card">
+          <h3>Account Information</h3>
+          <p class="muted" id="settingsEmail">Loading...</p>
+          <p class="muted" id="settingsRole"></p>
+          <p class="muted">Workspace: Infinite Flight Companion</p>
+          <p class="muted">Database: Cloud Firestore</p>
+        </div>
+      </section>
 
-      const memberSnapshot = await getDoc(memberRef);
+    </div>
+  </main>
+</div>
 
-      if (!memberSnapshot.exists()) {
-        await signOut(auth);
-        throw new Error(
-          "Your account has not been invited to this workspace."
-        );
-      }
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, onAuthStateChanged,
+  signOut, sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, collection, addDoc,
+  getDocs, query, orderBy, limit, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
 
-      const member = memberSnapshot.data();
+const firebaseConfig = {
+  apiKey: "AIzaSyDQgKie9EHcjG81IWxez_vxPue4zfFnZbk",
+  authDomain: "infinite-flight-companion.firebaseapp.com",
+  projectId: "infinite-flight-companion",
+  storageBucket: "infinite-flight-companion.firebasestorage.app",
+  messagingSenderId: "208265827432",
+  appId: "1:208265827432:web:72d8d6d7e2ce38ec1017dd"
+};
 
-      const workspaceRef = doc(db, "workspaces", "main");
-      const workspaceSnapshot = await getDoc(workspaceRef);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-      if (!workspaceSnapshot.exists()) {
-        throw new Error("Workspace not found. Contact the owner.");
-      }
+let currentUser = null;
+let currentRole = null;
+let flights = [];
 
-      if (member.role !== "owner" && member.role !== "member") {
-        throw new Error("Your account has an invalid workspace role.");
-      }
+const $ = id => document.getElementById(id);
 
-      loginPage.classList.add("hidden");
-      dashboardPage.classList.remove("hidden");
+function message(id,text,type="error"){
+  const el = $(id);
+  el.textContent = text;
+  el.className = "page-message " + type;
+}
 
-      document.getElementById("accountInfo").textContent =
-        `${user.email} • ${member.role.toUpperCase()}`;
-    }
+function showApp(){
+  $("loginPage").classList.add("hidden");
+  $("app").classList.remove("hidden");
+}
 
-    loginForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
+function showLogin(){
+  $("app").classList.add("hidden");
+  $("loginPage").classList.remove("hidden");
+}
 
-      loginButton.disabled = true;
-      loginButton.textContent = "Signing in...";
-      showMessage("");
+function navigate(page){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".nav-button[data-page]").forEach(b=>b.classList.remove("active"));
 
-      try {
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value;
+  const target = $("page-"+page);
+  if(!target) return;
+  target.classList.add("active");
 
-        await signInWithEmailAndPassword(auth, email, password);
-      } catch (error) {
-        showMessage(error.message);
-      } finally {
-        loginButton.disabled = false;
-        loginButton.textContent = "Sign In";
-      }
-    });
+  const nav = document.querySelector(`.nav-button[data-page="${page}"]`);
+  if(nav) nav.classList.add("active");
 
-    document.getElementById("resetButton").addEventListener("click",
-      async () => {
-        const email = document.getElementById("email").value.trim();
+  $("topTitle").textContent = nav ? nav.textContent.trim() : "Dashboard";
+  $("sidebar").classList.remove("open");
+  $("overlay").classList.remove("show");
+}
 
-        if (!email) {
-          showMessage("Enter your email address first.");
-          return;
-        }
+document.querySelectorAll("[data-page]").forEach(button=>{
+  button.addEventListener("click",()=>navigate(button.dataset.page));
+});
 
-        try {
-          await sendPasswordResetEmail(auth, email);
-          showMessage("Password reset email sent.", "success");
-        } catch (error) {
-          showMessage(error.message);
-        }
-      }
+document.querySelectorAll("[data-go]").forEach(button=>{
+  button.addEventListener("click",()=>navigate(button.dataset.go));
+});
+
+$("menuToggle").addEventListener("click",()=>{
+  $("sidebar").classList.toggle("open");
+  $("overlay").classList.toggle("show");
+});
+$("overlay").addEventListener("click",()=>{
+  $("sidebar").classList.remove("open");
+  $("overlay").classList.remove("show");
+});
+
+$("loginForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+  const button=$("loginButton");
+  button.disabled=true;
+  button.textContent="Signing in...";
+  message("loginMessage","");
+  try{
+    await signInWithEmailAndPassword(
+      auth,$("email").value.trim(),$("password").value
     );
+  }catch(error){
+    message("loginMessage",error.message);
+  }finally{
+    button.disabled=false;
+    button.textContent="Sign In";
+  }
+});
 
-    document.getElementById("logoutButton").addEventListener("click",
-      () => signOut(auth)
-    );
+$("resetButton").addEventListener("click",async()=>{
+  const email=$("email").value.trim();
+  if(!email){message("loginMessage","Enter your email address first.");return;}
+  try{
+    await sendPasswordResetEmail(auth,email);
+    message("loginMessage","Password reset email sent.","success");
+  }catch(error){message("loginMessage",error.message);}
+});
 
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        dashboardPage.classList.add("hidden");
-        loginPage.classList.remove("hidden");
-        return;
-      }
+$("logoutButton").addEventListener("click",()=>signOut(auth));
 
-      try {
-        await checkWorkspace(user);
-      } catch (error) {
-        dashboardPage.classList.add("hidden");
-        loginPage.classList.remove("hidden");
-        showMessage(error.message);
-      }
-    });
-  </script>
+async function loadWorkspace(user){
+  const memberRef=doc(db,"workspaces","main","members",user.uid);
+  const memberSnap=await getDoc(memberRef);
 
+  if(!memberSnap.exists()){
+    await signOut(auth);
+    throw new Error("This account is not a member of the workspace.");
+  }
+
+  const member=memberSnap.data();
+  if(!["owner","member"].includes(member.role)){
+    await signOut(auth);
+    throw new Error("This account has an invalid workspace role.");
+  }
+
+  const workspaceSnap=await getDoc(doc(db,"workspaces","main"));
+  if(!workspaceSnap.exists()) throw new Error("Workspace document not found.");
+
+  currentRole=member.role;
+  currentUser=user;
+
+  $("accountEmail").textContent=user.email;
+  $("settingsEmail").textContent="Email: "+user.email;
+  $("settingsRole").textContent="Role: "+currentRole;
+  showApp();
+  await loadFlights();
+}
+
+async function loadFlights(){
+  try{
+    const flightsRef=collection(db,"workspaces","main","flights");
+    const flightQuery=query(flightsRef,orderBy("createdAt","desc"),limit(50));
+    const snapshot=await getDocs(flightQuery);
+    flights=snapshot.docs.map(d=>({id:d.id,...d.data()}));
+    renderFlights();
+  }catch(error){
+    console.error("Flight loading error:",error);
+    message("flightMessage","Could not load flights: "+error.message);
+  }
+}
+
+function renderFlights(){
+  $("totalFlights").textContent=flights.length;
+  $("activeFlight").textContent=flights.length ? "1" : "0";
+
+  const recent=$("recentFlights");
+  const history=$("historyFlights");
+
+  if(!flights.length){
+    recent.innerHTML='<tr><td colspan="4" class="empty">No flights saved yet. Create your first flight.</td></tr>';
+    history.innerHTML='<tr><td colspan="5" class="empty">No flight history yet.</td></tr>';
+    return;
+  }
+
+  recent.innerHTML=flights.slice(0,5).map(f=>`
+    <tr>
+      <td>${escapeHTML(f.flightNumber)}</td>
+      <td>${escapeHTML(f.airline)}</td>
+      <td>${escapeHTML(f.departure)} → ${escapeHTML(f.destination)}</td>
+      <td>${escapeHTML(f.aircraft)}</td>
+    </tr>`).join("");
+
+  history.innerHTML=flights.map(f=>`
+    <tr>
+      <td>${escapeHTML(f.flightNumber)}</td>
+      <td>${escapeHTML(f.airline)}</td>
+      <td>${escapeHTML(f.departure)} → ${escapeHTML(f.destination)}</td>
+      <td>${escapeHTML(f.flightDate||"")}</td>
+      <td>${escapeHTML(f.aircraft)}</td>
+    </tr>`).join("");
+}
+
+function escapeHTML(value){
+  return String(value??"").replace(/[&<>"']/g,char=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[char]);
+}
+
+$("flightForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+  if(!currentUser){message("flightMessage","Please sign in again.");return;}
+
+  const button=$("saveFlightButton");
+  button.disabled=true;
+  button.textContent="Saving...";
+
+  const flight={
+    airline:$("airline").value.trim(),
+    flightNumber:$("flightNumber").value.trim().toUpperCase(),
+    departure:$("departure").value.trim().toUpperCase(),
+    destination:$("destination").value.trim().toUpperCase(),
+    aircraft:$("aircraft").value.trim(),
+    flightDate:$("flightDate").value,
+    departureTime:$("departureTime").value,
+    captain:$("captain").value.trim(),
+    createdBy:currentUser.uid,
+    createdAt:serverTimestamp()
+  };
+
+  try{
+    await addDoc(collection(db,"workspaces","main","flights"),flight);
+    message("flightMessage","Flight saved successfully!","success");
+    $("flightForm").reset();
+    await loadFlights();
+  }catch(error){
+    message("flightMessage","Could not save flight: "+error.message);
+  }finally{
+    button.disabled=false;
+    button.textContent="Save Flight";
+  }
+});
+
+onAuthStateChanged(auth,async user=>{
+  if(!user){
+    currentUser=null;
+    currentRole=null;
+    showLogin();
+    return;
+  }
+  try{
+    await loadWorkspace(user);
+  }catch(error){
+    console.error(error);
+    showLogin();
+    message("loginMessage",error.message);
+  }
+});
+</script>
 </body>
 </html>
