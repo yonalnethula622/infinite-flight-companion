@@ -563,6 +563,10 @@ function navigate(page){
   const target = $("page-"+page);
   if(!target) return;
   target.classList.add("active");
+  if (page === "checkin") {
+  populatePassengerFlights();
+  loadPassengers();
+}
 
   const nav = document.querySelector(`.nav-button[data-page="${page}"]`);
   if(nav) nav.classList.add("active");
@@ -666,6 +670,7 @@ async function loadFlights(){
     const snapshot=await getDocs(flightQuery);
     flights=snapshot.docs.map(d=>({id:d.id,...d.data()}));
     renderFlights();
+    populatePassengerFlights();
   }catch(error){
     console.error("Flight loading error:",error);
     message("flightMessage","Could not load flights: "+error.message);
