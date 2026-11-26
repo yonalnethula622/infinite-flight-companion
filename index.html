@@ -413,6 +413,8 @@ $("resetButton").addEventListener("click",async()=>{
 
 $("logoutButton").addEventListener("click",()=>signOut(auth));
 
+$("topLogoutButton").addEventListener("click",()=>signOut(auth));
+
 async function loadWorkspace(user){
   const memberRef=doc(db,"workspaces","main","members",user.uid);
   const memberSnap=await getDoc(memberRef);
