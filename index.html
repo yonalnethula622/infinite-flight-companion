@@ -250,10 +250,108 @@ th{color:var(--muted);font-weight:normal}
         </div>
       </section>
 
-      <section class="page" id="page-checkin">
-        <div class="page-heading"><h1>Passenger Check-in</h1><p>Passenger registration and check-in management.</p></div>
-        <div class="notice">This section is planned for passenger details, seat selection, check-in status and boarding pass creation. The passenger system will be connected to your selected flight in the next development stage.</div>
-      </section>
+      
+<section class="page" id="page-checkin">
+  <div class="page-heading">
+    <h1>Passenger Check-in</h1>
+    <p>Register passengers, select seats and generate boarding passes.</p>
+  </div>
+
+  <div class="card">
+    <h2>1. Select Flight</h2>
+    <label>Choose a saved flight</label>
+    <select id="passengerFlight">
+      <option value="">Select a flight</option>
+    </select>
+    <p id="passengerFlightInfo" class="muted"></p>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <h2>2. Passenger Details</h2>
+    <form id="passengerForm">
+      <div class="form-grid">
+        <div>
+          <label>Passenger full name</label>
+          <input id="passengerName" required placeholder="Full name">
+        </div>
+        <div>
+          <label>Phone number (optional)</label>
+          <input id="passengerPhone" type="tel" placeholder="Phone number">
+        </div>
+        <div>
+          <label>Email (optional)</label>
+          <input id="passengerEmail" type="email" placeholder="Email address">
+        </div>
+      </div>
+
+      <h3>3. Select a Seat</h3>
+      <div class="notice">
+        Available seats are selectable. Occupied seats cannot be selected.
+        This initial layout uses a standard A–F seating arrangement.
+      </div>
+
+      <div class="seat-legend">
+        <span><i class="seat-dot available"></i> Available</span>
+        <span><i class="seat-dot selected"></i> Selected</span>
+        <span><i class="seat-dot occupied"></i> Occupied</span>
+      </div>
+
+      <div id="seatMap" class="seat-map">
+        <p class="muted">Select a flight to see available seats.</p>
+      </div>
+
+      <p id="selectedSeatText" class="success">No seat selected.</p>
+
+      <button class="primary" id="registerPassengerButton" type="submit">
+        Register Passenger
+      </button>
+      <p id="passengerMessage" class="page-message"></p>
+    </form>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <h2>4. Registered Passengers</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Passenger</th><th>Seat</th><th>Status</th><th>Boarding Pass</th></tr>
+        </thead>
+        <tbody id="passengerList">
+          <tr><td colspan="4" class="empty">Select a flight first.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="boardingPass" class="boarding-pass hidden">
+    <div class="boarding-pass-header">
+      <strong>✈ INFINITE FLIGHT COMPANION</strong>
+      <span>BOARDING PASS</span>
+    </div>
+    <div class="boarding-pass-body">
+      <div>
+        <p class="muted">PASSENGER</p>
+        <h2 id="bpName"></h2>
+        <p class="muted">FLIGHT</p>
+        <h3 id="bpFlight"></h3>
+        <p class="muted">FROM</p>
+        <h3 id="bpFrom"></h3>
+        <p class="muted">TO</p>
+        <h3 id="bpTo"></h3>
+        <p class="muted">SEAT</p>
+        <h2 id="bpSeat" class="gold-text"></h2>
+      </div>
+      <div id="boardingQR"></div>
+    </div>
+    <p class="boarding-pass-footer">
+      Please keep this boarding pass ready for boarding.
+    </p>
+    <button class="primary" type="button" onclick="window.print()">
+      Print Boarding Pass
+    </button>
+  </div>
+</section>
+
 
       <section class="page" id="page-boarding">
         <div class="page-heading"><h1>Boarding Management</h1><p>Manage passenger boarding and airport announcements.</p></div>
