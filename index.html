@@ -411,9 +411,20 @@ $("resetButton").addEventListener("click",async()=>{
   }catch(error){message("loginMessage",error.message);}
 });
 
-$("logoutButton").addEventListener("click",()=>signOut(auth));
+async function logoutUser() {
+  try {
+    await signOut(auth);
+    currentUser = null;
+    currentRole = null;
+    showLogin();
+  } catch (error) {
+    alert("Logout failed: " + error.message);
+  }
+}
 
-$("topLogoutButton").addEventListener("click",()=>signOut(auth));
+$("logoutButton").addEventListener("click", logoutUser);
+
+$("topLogoutButton").addEventListener("click", logoutUser);
 
 async function loadWorkspace(user){
   const memberRef=doc(db,"workspaces","main","members",user.uid);
