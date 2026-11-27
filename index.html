@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -84,7 +83,7 @@ button.primary{background:var(--gold);color:#101827;border:0;border-radius:8px;p
    </section>
    <section class="page" id="page-audio">
     <div class="heading"><h1>Audio Centre</h1><p>Your 35 MP3 files are connected using the GitHub folder paths.</p></div>
-    <div class="card"><div class="row"><div><b>Audio playback</b><p class="muted small">Airport and cabin chime → 2-second pause → announcement. Captain announcement → radio ending. Music pauses and resumes at the same position.</p></div><span class="pill" id="audioStatus">Ready</span></div><div class="row"><button class="primary" id="playBoardingMusic">Play boarding music</button><button class="secondary" id="playLoungeMusic">Play lounge music</button><button class="danger" id="stopAudio">Stop all audio</button></div><p id="audioMessage" class="message"></p></div><div class="card"><h3>Announcement Quick Search</h3><p class="muted small">Type a name such as delay, turbulence, boarding or landing, then press Enter to play the best match.</p><div class="audio-tools"><input id="announcementSearch" type="search" placeholder="Search announcements…" autocomplete="off"><button class="primary" id="searchPlayButton">Search & Play</button></div><div id="announcementSearchResults" class="search-results hidden"></div></div><div class="card"><div class="row"><div><h3>Keyboard shortcuts</h3><p class="muted small">Edit a shortcut beside each audio, then save. Shortcuts use Ctrl + Alt + key.</p></div><button class="secondary" id="saveShortcutsButton">Save shortcuts</button></div><p id="shortcutMessage" class="message"></p><div id="shortcutList"></div><p class="shortcut-help">Shortcuts are saved in this browser on this device. They are ignored while you are typing in text fields.</p></div>
+    <div class="card"><div class="row"><div><b>Background music controls</b><p class="muted small">Music continues underneath announcements. Use the fade-out buttons to lower the music gradually over 4 seconds before switching tracks or ending the music.</p></div><span class="pill" id="audioStatus">Ready</span></div><div class="row"><button class="primary" id="playLoungeMusic">Play lounge music</button><button class="secondary" id="fadeLoungeMusic">Fade out lounge music · 4 sec</button></div><div class="row"><button class="primary" id="playBoardingMusic">Play boarding music</button><button class="secondary" id="fadeBoardingMusic">Fade out boarding music · 4 sec</button></div><div class="row"><button class="danger" id="stopAudio">Stop all audio</button></div><p id="audioMessage" class="message"></p></div><div class="card"><h3>Announcement Quick Search</h3><p class="muted small">Type a name such as delay, turbulence, boarding or landing, then press Enter to play the best match.</p><div class="audio-tools"><input id="announcementSearch" type="search" placeholder="Search announcements…" autocomplete="off"><button class="primary" id="searchPlayButton">Search & Play</button></div><div id="announcementSearchResults" class="search-results hidden"></div></div><div class="card"><div class="row"><div><h3>Keyboard shortcuts</h3><p class="muted small">Edit a shortcut beside each audio, then save. Shortcuts use Ctrl + Alt + key.</p></div><button class="secondary" id="saveShortcutsButton">Save shortcuts</button></div><p id="shortcutMessage" class="message"></p><div id="shortcutList"></div><p class="shortcut-help">Shortcuts are saved in this browser on this device. They are ignored while you are typing in text fields.</p></div>
     <div class="card"><h3>Airport PA</h3><div id="airportAudioList"></div></div><div class="card"><h3>Cabin announcements</h3><div id="cabinAudioList"></div></div><div class="card"><h3>Captain announcements</h3><div id="captainAudioList"></div></div><div class="card"><h3>Sound effects</h3><div id="effectsAudioList"></div></div>
    </section>
    <section class="page" id="page-history"><div class="heading"><h1>Flight History</h1><p>All flights saved to your Firestore workspace.</p></div><div class="card tablewrap"><table><thead><tr><th>Flight</th><th>Airline</th><th>Route</th><th>Date</th><th>Aircraft</th></tr></thead><tbody id="historyFlights"><tr><td colspan="5">No history.</td></tr></tbody></table></div></section>
@@ -118,7 +117,7 @@ const files={
  music:[["31_boarding_music","Boarding music"],["32_lounge_music","Lounge music"]],
  effects:[["33_airport_pa_chime","Airport PA chime"],["34_cabin_announcement_chime","Cabin announcement chime"],["35_captain_radio_end","Captain radio end"]]
 };
-let musicAudio=null,currentAnnouncement=null,playToken=0,musicResumeTime=0,musicResumeFile="",audioDelayTimer=null;
+let musicAudio=null,currentMusicFile="",currentAnnouncement=null,playToken=0,audioDelayTimer=null,musicFadeTimer=null;
 const shortcutStorageKey="ifc_audio_shortcuts_v1";
 const shortcutKeys=["1","2","3","4","5","6","7","8","9","0","Q","W","E","R","T","Y","U","I","O","P","A","S","D","F","G","H","J","K","L","Z","X","C","V","B"];
 let audioShortcuts=loadShortcuts();
@@ -172,10 +171,57 @@ function allAudioEntriesSeed(){
 function findFile(id){for(const [category,arr] of Object.entries(files))for(const [file,label] of arr)if(file===id)return{category,file,label};return null}
 function storageFolder(category){if(category==="airport"||category==="cabin")return "announcements";return category}
 function audioPath(category,file){return path(storageFolder(category),file)}
-function stopMusic(){if(musicAudio){musicAudio.pause();musicAudio=null}musicResumeTime=0;musicResumeFile=""}
-function stopActiveAnnouncement(){if(currentAnnouncement){const old=currentAnnouncement;currentAnnouncement=null;old.pause();old.currentTime=0}}
-function stopAllAudio(){playToken++;if(audioDelayTimer){clearTimeout(audioDelayTimer);audioDelayTimer=null}stopActiveAnnouncement();stopMusic();$("audioStatus").textContent="Stopped"}
-function playMusic(file){stopAllAudio();musicResumeFile=file;musicResumeTime=0;musicAudio=new Audio(path("music",file));musicAudio.loop=true;musicAudio.volume=.45;musicAudio.play().then(()=>$("audioStatus").textContent="Music playing").catch(e=>msg("audioMessage","Could not play "+file+". Check the GitHub file path. "+e.message,"err"))}
+function stopMusic(){
+ if(musicFadeTimer){clearInterval(musicFadeTimer);musicFadeTimer=null}
+ if(musicAudio){musicAudio.pause();musicAudio.currentTime=0;musicAudio=null}
+ currentMusicFile="";
+}
+function fadeOutMusic(file){
+ if(!musicAudio||musicAudio.paused){msg("audioMessage","No background music is currently playing.","err");return}
+ if(currentMusicFile!==file){msg("audioMessage","That music track is not currently playing.","err");return}
+ if(musicFadeTimer){clearInterval(musicFadeTimer);musicFadeTimer=null}
+ const audio=musicAudio;
+ const startingVolume=audio.volume;
+ const duration=4000;
+ const started=Date.now();
+ msg("audioMessage","Fading out "+file.replace(/_/g," ")+"...","ok");
+ musicFadeTimer=setInterval(()=>{
+  const progress=Math.min((Date.now()-started)/duration,1);
+  audio.volume=startingVolume*(1-progress);
+  if(progress>=1){
+   clearInterval(musicFadeTimer);musicFadeTimer=null;
+   audio.pause();audio.currentTime=0;
+   if(musicAudio===audio){musicAudio=null;currentMusicFile=""}
+   $("audioStatus").textContent="Music faded out";
+   msg("audioMessage","Music has faded out and stopped.","ok");
+  }
+ },50);
+}
+function stopActiveAnnouncement(){
+ if(currentAnnouncement){const old=currentAnnouncement;currentAnnouncement=null;old.pause();old.currentTime=0}
+}
+function stopAllAudio(){
+ playToken++;
+ if(audioDelayTimer){clearTimeout(audioDelayTimer);audioDelayTimer=null}
+ stopActiveAnnouncement();stopMusic();
+ $("audioStatus").textContent="Stopped";
+ msg("audioMessage","All audio stopped.","ok");
+}
+function playMusic(file){
+ // Starting a different music track replaces only the background music.
+ // It does not stop an announcement that is already playing.
+ stopMusic();
+ currentMusicFile=file;
+ const audio=new Audio(path("music",file));
+ musicAudio=audio;
+ audio.loop=true;
+ audio.volume=.45;
+ audio.play().then(()=>{
+  if(musicAudio===audio){$("audioStatus").textContent="Background music playing";msg("audioMessage","Now playing: "+file.replace(/_/g," "),"ok")}
+ }).catch(e=>{
+  if(musicAudio===audio){musicAudio=null;currentMusicFile="";msg("audioMessage","Could not play "+file+". Check the GitHub file path. "+e.message,"err")}
+ });
+}
 function waitWithToken(ms,token){return new Promise((resolve,reject)=>{audioDelayTimer=setTimeout(()=>{audioDelayTimer=null;if(token===playToken)resolve();else reject(Error("Playback cancelled"))},ms)})}
 function playOne(category,file,token){return new Promise((resolve,reject)=>{
  const a=new Audio(audioPath(category,file));currentAnnouncement=a;$("audioStatus").textContent="Playing "+file;
@@ -254,7 +300,12 @@ $("saveShortcutsButton").addEventListener("click",saveShortcuts);
 $("announcementSearch").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();searchAnnouncements()}});
 $("searchPlayButton").addEventListener("click",searchAnnouncements);
 document.addEventListener("keydown",playByShortcut);
-$("playBoardingMusic").addEventListener("click",()=>playMusic("31_boarding_music"));$("playLoungeMusic").addEventListener("click",()=>playMusic("32_lounge_music"));$("stopAudio").addEventListener("click",stopAllAudio);$("settingsStopAudio").addEventListener("click",stopAllAudio);
+$("playLoungeMusic").addEventListener("click",()=>playMusic("32_lounge_music"));
+$("fadeLoungeMusic").addEventListener("click",()=>fadeOutMusic("32_lounge_music"));
+$("playBoardingMusic").addEventListener("click",()=>playMusic("31_boarding_music"));
+$("fadeBoardingMusic").addEventListener("click",()=>fadeOutMusic("31_boarding_music"));
+$("stopAudio").addEventListener("click",stopAllAudio);
+$("settingsStopAudio").addEventListener("click",stopAllAudio);
 </script>
 </body>
 </html>
