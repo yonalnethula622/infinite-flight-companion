@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -97,6 +98,7 @@ button.primary{background:var(--gold);color:#101827;border:0;border-radius:8px;p
 import{initializeApp}from"https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
 import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut,sendPasswordResetEmail}from"https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
 import{getFirestore,doc,getDoc,collection,addDoc,getDocs,query,orderBy,limit,serverTimestamp,where,updateDoc,setDoc}from"https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
+
 const firebaseConfig={
  apiKey:"AIzaSyDQgKie9EHcjG81IWxez_vxPue4zfFnZbk",
  authDomain:"infinite-flight-companion.firebaseapp.com",
@@ -120,7 +122,6 @@ let musicAudio=null,currentMusicFile="",currentAnnouncement=null,playToken=0,aud
 const shortcutStorageKey="ifc_audio_shortcuts_v1";
 const shortcutKeys=["1","2","3","4","5","6","7","8","9","0","Q","W","E","R","T","Y","U","I","O","P","A","S","D","F","G","H","J","K","L","Z","X","C","V","B"];
 let audioShortcuts=loadShortcuts();
- 
 function msg(id,text,kind="muted"){const e=$(id);if(e){e.textContent=text;e.className="message "+kind}}
 function safe(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function showApp(){$("loginPage").classList.add("hidden");$("app").classList.remove("hidden")}
@@ -140,10 +141,34 @@ function renderFlights(){const rows=flights.map(f=>`<tr><td>${safe(f.flightNumbe
 function populateFlightSelect(id){const el=$(id);if(!el)return;const old=el.value;el.innerHTML='<option value="">Select a flight</option>'+flights.map(f=>`<option value="${safe(f.id)}">${safe(f.flightNumber)} — ${safe(f.departure)} to ${safe(f.destination)}</option>`).join("");if(flights.some(f=>f.id===old))el.value=old}
 $("flightForm").addEventListener("submit",async e=>{e.preventDefault();const btn=$("saveFlightButton");btn.disabled=true;const f={airline:$("airline").value.trim(),flightNumber:$("flightNumber").value.trim().toUpperCase(),departure:$("departure").value.trim().toUpperCase(),destination:$("destination").value.trim().toUpperCase(),aircraft:$("aircraft").value.trim(),flightDate:$("flightDate").value,departureTime:$("departureTime").value,captain:$("captain").value.trim(),createdBy:currentUser.uid,createdAt:serverTimestamp()};try{await addDoc(collection(db,"workspaces","main","flights"),f);msg("flightMessage","Flight saved successfully.","ok");$("flightForm").reset();await loadFlights()}catch(err){msg("flightMessage",err.message,"err")}finally{btn.disabled=false}});
 async function loadPassengers(flightId){if(!flightId){passengers=[];renderPassengers();return}const snap=await getDocs(query(collection(db,"workspaces","main","passengers"),where("flightId","==",flightId)));passengers=snap.docs.map(d=>({id:d.id,...d.data()}));$("totalPassengers").textContent=passengers.length;renderPassengers();renderBoarding()}
-function renderPassengers(){const flightId=$("passengerFlight").value;selectedCheckinFlight=flights.find(f=>f.id===flightId)||null;$("passengerFlightInfo").textContent=selectedCheckinFlight?`${selectedCheckinFlight.airline} | ${selectedCheckinFlight.flightNumber} | ${selectedCheckinFlight.departure} → ${selectedCheckinFlight.destination}`:"";$("seatMap").innerHTML="";if(!flightId){$("seatMap").textContent="Select a flight first.";return}const cols=["A","B","C","","D","E","F"];for(let r=1;r<=20;r++)for(const c of cols){if(!c){const gap=document.createElement("div");gap.className="aisle";$("seatMap").append(gap);continue}const seat=c+r,occupied=passengers.some(p=>p.seat===seat),b=document.createElement("button");b.type="button";b.className="seat"+(occupied?" occupied":"")+(selectedSeat===seat?" selected":"");b.textContent=seat;b.disabled=occupied;b.onclick=()=>{selectedSeat=seat;$("selectedSeatText").textContent="Selected seat: "+seat;renderPassengers()};$("seatMap").append(b)}$("selectedSeatText").textContent=selectedSeat?"Selected seat: "+selectedSeat:"No seat selected.";const body=$("passengerList");body.innerHTML=passengers.map(p=>`<tr><td>${safe(p.name)}</td><td>${safe(p.seat)}</td><td>${safe(p.group||"Group 1")}</td><td>${p.boarded?"Boarded":"Checked in"}</td><td><button class="secondary" data-pass="${safe(p.id)}">View</button></td></tr>`).join("")||'<tr><td colspan="5">No passengers registered.</td></tr>';body.querySelectorAll("[data-pass]").forEach(b=>b.onclick=()=>showPass(passengers.find(p=>p.id===b.dataset.pass)))}
+function renderPassengers(){const flightId=$("passengerFlight").value;selectedCheckinFlight=flights.find(f=>f.id===flightId)||null;$("passengerFlightInfo").textContent=selectedCheckinFlight?`${selectedCheckinFlight.airline} | ${selectedCheckinFlight.flightNumber} | ${selectedCheckinFlight.departure} → ${selectedCheckinFlight.destination}`:"";$("seatMap").innerHTML="";if(!flightId){$("seatMap").textContent="Select a flight first.";return}const cols=["A","B","C","","D","E","F"];for(let r=1;r<=20;r++)for(const c of cols){if(!c){const gap=document.createElement("div");gap.className="aisle";$("seatMap").append(gap);continue}const seat=c+r,occupied=passengers.some(p=>p.seat===seat),b=document.createElement("button");b.type="button";b.className="seat"+(occupied?" occupied":"")+(selectedSeat===seat?" selected":"");b.textContent=seat;b.disabled=occupied;b.onclick=()=>{selectedSeat=seat;$("selectedSeatText").textContent="Selected seat: "+seat;renderPassengers()};$("seatMap").append(b)}$("selectedSeatText").textContent=selectedSeat?"Selected seat: "+selectedSeat:"No seat selected.";const body=$("passengerList");body.innerHTML=passengers.map(p=>`<tr><td>${safe(p.name)}</td><td>${safe(p.seat)}</td><td>${safe(p.group||"Group 1")}</td><td>${p.boarded?"Boarded":"Checked in"}</td><td><button class="secondary" data-pass="${safe(p.id)}">View</button></td></tr>`).join("")||'<tr><td colspan="5">No passengers registered.</td></tr>';body.querySelectorAll("[data-pass]").forEach(b=>b.onclick=async()=>{const p=passengers.find(p=>p.id===b.dataset.pass);if(p)await showPass(p)})}
 $("passengerFlight").addEventListener("change",async()=>{selectedSeat="";try{await loadPassengers($("passengerFlight").value)}catch(e){msg("passengerMessage",e.message,"err")}});
-$("passengerForm").addEventListener("submit",async e=>{e.preventDefault();const f=selectedCheckinFlight;if(!f)return msg("passengerMessage","Select a flight first.","err");if(!selectedSeat)return msg("passengerMessage","Select a seat first.","err");if(passengers.some(p=>p.seat===selectedSeat))return msg("passengerMessage","That seat is already occupied.","err");const btn=$("registerPassengerButton");btn.disabled=true;const p={name:$("passengerName").value.trim(),phone:$("passengerPhone").value.trim(),email:$("passengerEmail").value.trim(),seat:selectedSeat,group:$("passengerGroup").value,flightId:f.id,flightNumber:f.flightNumber,airline:f.airline,departure:f.departure,destination:f.destination,checkedIn:true,boarded:false,createdBy:currentUser.uid,createdAt:serverTimestamp()};try{const ref=await addDoc(collection(db,"workspaces","main","passengers"),p);selectedSeat="";$("passengerForm").reset();await loadPassengers(f.id);showPass({id:ref.id,...p});msg("passengerMessage","Passenger registered.","ok")}catch(err){msg("passengerMessage",err.message,"err")}finally{btn.disabled=false}});
-function showPass(p){$("bpName").textContent=p.name;$("bpFlight").textContent=p.flightNumber;$("bpRoute").textContent=`${p.departure} → ${p.destination}`;$("bpSeat").textContent=p.seat;$("boardingPass").classList.remove("hidden");$("boardingQR").innerHTML="";if(window.QRCode)new QRCode($("boardingQR"),{text:JSON.stringify({bookingId:p.id,flight:p.flightNumber,seat:p.seat}),width:110,height:110});$("boardingPass").scrollIntoView({behavior:"smooth"})}
+$("passengerForm").addEventListener("submit",async e=>{e.preventDefault();const f=selectedCheckinFlight;if(!f)return msg("passengerMessage","Select a flight first.","err");if(!selectedSeat)return msg("passengerMessage","Select a seat first.","err");if(passengers.some(p=>p.seat===selectedSeat))return msg("passengerMessage","That seat is already occupied.","err");const btn=$("registerPassengerButton");btn.disabled=true;const p={name:$("passengerName").value.trim(),phone:$("passengerPhone").value.trim(),email:$("passengerEmail").value.trim(),seat:selectedSeat,group:$("passengerGroup").value,flightId:f.id,flightNumber:f.flightNumber,airline:f.airline,departure:f.departure,destination:f.destination,checkedIn:true,boarded:false,createdBy:currentUser.uid,createdAt:serverTimestamp()};try{const ref=await addDoc(collection(db,"workspaces","main","passengers"),p);selectedSeat="";$("passengerForm").reset();await loadPassengers(f.id);await showPass({id:ref.id,...p});msg("passengerMessage","Passenger registered and passenger link created.","ok")}catch(err){msg("passengerMessage",err.message,"err")}finally{btn.disabled=false}});
+async function showPass(p){
+ try{
+  let token=p.accessCode;
+  if(!token){
+   const bytes=crypto.getRandomValues(new Uint8Array(32));
+   token=Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join("");
+   await updateDoc(doc(db,"workspaces","main","passengers",p.id),{accessCode:token});
+  }
+  await setDoc(doc(db,"passengerAccess",token),{
+   name:p.name,seat:p.seat,flightId:p.flightId,flightNumber:p.flightNumber,
+   airline:p.airline,departure:p.departure,destination:p.destination,
+   phase:"Waiting for departure",status:"waiting"
+  });
+  const passengerURL=new URL("passenger.html",window.location.href);
+  passengerURL.searchParams.set("code",token);
+  $("bpName").textContent=p.name;
+  $("bpFlight").textContent=p.flightNumber;
+  $("bpRoute").textContent=`${p.departure} → ${p.destination}`;
+  $("bpSeat").textContent=p.seat;
+  $("boardingPass").classList.remove("hidden");
+  $("boardingQR").innerHTML="";
+  if(window.QRCode)new QRCode($("boardingQR"),{text:passengerURL.href,width:110,height:110});
+  $("boardingPass").scrollIntoView({behavior:"smooth"});
+ }catch(error){msg("passengerMessage","Could not create passenger access: "+error.message,"err")}
+}
 $("printPassButton").addEventListener("click",()=>{document.body.classList.add("printpass");window.print()});window.addEventListener("afterprint",()=>document.body.classList.remove("printpass"));
 $("boardingFlight").addEventListener("change",async()=>{try{await loadPassengers($("boardingFlight").value);renderBoarding()}catch(e){msg("boardingMessage",e.message,"err")}});
 function renderBoarding(){const list=$("boardingList");if(!list)return;const flightId=$("boardingFlight").value;if(!flightId){list.innerHTML='<tr><td colspan="5">Select a flight.</td></tr>';return}const f=flights.find(x=>x.id===flightId);$("boardingInfo").textContent=f?`${f.airline} | ${f.flightNumber} | ${f.departure} → ${f.destination}`:"";const boarded=passengers.filter(p=>p.boarded).length;$("boardRegistered").textContent=passengers.length;$("boardCount").textContent=boarded;$("boardRemaining").textContent=passengers.length-boarded;list.innerHTML=passengers.map(p=>`<tr><td>${safe(p.name)}</td><td>${safe(p.seat)}</td><td>${safe(p.group||"Group 1")}</td><td>${p.boarded?"Boarded":"Waiting"}</td><td>${p.boarded?"—":`<button class="secondary" data-board="${safe(p.id)}">Mark boarded</button>`}</td></tr>`).join("")||'<tr><td colspan="5">No passengers for this flight.</td></tr>';list.querySelectorAll("[data-board]").forEach(b=>b.onclick=async()=>{try{await updateDoc(doc(db,"workspaces","main","passengers",b.dataset.board),{boarded:true,boardedAt:serverTimestamp()});await loadPassengers(flightId)}catch(e){msg("boardingMessage",e.message,"err")}})}
