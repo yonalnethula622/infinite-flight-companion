@@ -120,6 +120,7 @@ let musicAudio=null,currentMusicFile="",currentAnnouncement=null,playToken=0,aud
 const shortcutStorageKey="ifc_audio_shortcuts_v1";
 const shortcutKeys=["1","2","3","4","5","6","7","8","9","0","Q","W","E","R","T","Y","U","I","O","P","A","S","D","F","G","H","J","K","L","Z","X","C","V","B"];
 let audioShortcuts=loadShortcuts();
+ 
 function msg(id,text,kind="muted"){const e=$(id);if(e){e.textContent=text;e.className="message "+kind}}
 function safe(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function showApp(){$("loginPage").classList.add("hidden");$("app").classList.remove("hidden")}
