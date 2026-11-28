@@ -22,6 +22,7 @@
       --blue: #63a8ff;
       --cyan: #52d6e8;
       --green: #55d6a0;
+      --red: #ff7272;
     }
 
     * {
@@ -392,6 +393,81 @@
       overflow-wrap: anywhere;
     }
 
+    /* AUDIO CENTRE */
+
+    .audio-card {
+      border-color: rgba(82,214,232,.19);
+    }
+
+    .audio-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px;
+      background: rgba(255,255,255,.035);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      margin-bottom: 16px;
+    }
+
+    .audio-status-dot {
+      width: 9px;
+      height: 9px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: var(--red);
+    }
+
+    .audio-status-dot.enabled {
+      background: var(--green);
+      box-shadow: 0 0 12px var(--green);
+    }
+
+    .audio-status-text {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .audio-button {
+      display: block;
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      padding: 15px 18px;
+      background: linear-gradient(135deg, #347fe0, #35aeca);
+      color: white;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: opacity .2s, transform .2s;
+    }
+
+    .audio-button:active {
+      transform: scale(.98);
+    }
+
+    .audio-button:disabled {
+      opacity: .65;
+      cursor: wait;
+    }
+
+    .audio-note {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.6;
+      margin-top: 12px;
+    }
+
+    .audio-now {
+      margin-top: 14px;
+      color: var(--cyan);
+      font-size: 12px;
+      min-height: 18px;
+      overflow-wrap: anywhere;
+    }
+
     .footer {
       color: #64728a;
       font-size: 11px;
@@ -512,26 +588,19 @@
       </div>
     </header>
 
-    <!-- LOADING SCREEN -->
     <section id="loadingScreen" class="state-screen">
       <div class="loader"></div>
       <h2>Connecting to your flight</h2>
       <p>Please wait while we load your passenger information.</p>
     </section>
 
-    <!-- ERROR SCREEN -->
     <section id="errorScreen" class="state-screen" hidden>
       <div class="state-icon">!</div>
       <h2 id="errorTitle">Unable to open passenger page</h2>
-      <p id="errorMessage">
-        Please check your link and try again.
-      </p>
-      <button class="retry-button" id="retryButton">
-        Try again
-      </button>
+      <p id="errorMessage">Please check your link and try again.</p>
+      <button class="retry-button" id="retryButton">Try again</button>
     </section>
 
-    <!-- PASSENGER CONTENT -->
     <main id="passengerContent" hidden>
 
       <section class="welcome">
@@ -542,7 +611,6 @@
 
       <!-- FLIGHT INFORMATION -->
       <section class="card">
-
         <div class="flight-top">
           <div>
             <div class="flight-label">FLIGHT DETAILS</div>
@@ -585,7 +653,32 @@
         </div>
       </section>
 
-      <!-- LIVE FLIGHT PHASE -->
+      <!-- PASSENGER AUDIO -->
+      <section class="card audio-card">
+        <div class="section-heading">Cabin Audio</div>
+        <div class="section-description">
+          Listen to live announcements and background music from your flight crew.
+        </div>
+
+        <div class="audio-status">
+          <span class="audio-status-dot" id="audioStatusDot"></span>
+          <div class="audio-status-text" id="audioStatusText">
+            Audio is not enabled. Tap the button below to allow flight announcements.
+          </div>
+        </div>
+
+        <button class="audio-button" id="enableAudioButton">
+          Enable Flight Audio
+        </button>
+
+        <div class="audio-note">
+          Your browser requires one tap before it can play audio. Keep this page open to receive live announcements.
+        </div>
+
+        <div class="audio-now" id="audioNow"></div>
+      </section>
+
+      <!-- FLIGHT PROGRESS -->
       <section class="card">
         <div class="section-heading">Flight progress</div>
         <div class="section-description">
@@ -634,15 +727,16 @@
     import {
       getFirestore,
       doc,
+      collection,
       onSnapshot
     } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
 
     // =========================================
-    // YOUR EXISTING FIREBASE CONFIGURATION
+    // FIREBASE CONFIGURATION
     // =========================================
 
     const firebaseConfig = {
-      apiKey: "AIzaSyDQgKie9EHcjG81IWxez_vxPue4zfFnZbk",
+      apiKey: "AIzaSyDQkGie9EHcjG81IWxez_vxPue4zfFnZbk",
       authDomain: "infinite-flight-companion.firebaseapp.com",
       projectId: "infinite-flight-companion",
       storageBucket: "infinite-flight-companion.firebasestorage.app",
@@ -654,18 +748,510 @@
     const db = getFirestore(app);
 
     // =========================================
-    // PAGE ELEMENTS
+    // GLOBAL VARIABLES
+    // =========================================
+
+    let unsubscribePassenger = null;
+    let unsubscribeAudio = null;
+
+    let passengerToken = null;
+    let audioEnabled = false;
+    let audioContext = null;
+
+    let announcementAudio = null;
+    let musicAudio = null;
+
+    let announcementQueue = Promise.resolve();
+    let playbackToken = 0;
+    let audioSnapshotFirst = true;
+
+    // =========================================
+    // ELEMENTS
     // =========================================
 
     const loadingScreen = document.getElementById("loadingScreen");
     const errorScreen = document.getElementById("errorScreen");
     const passengerContent = document.getElementById("passengerContent");
 
-    let unsubscribe = null;
+    const enableAudioButton = document.getElementById("enableAudioButton");
+    const audioStatusDot = document.getElementById("audioStatusDot");
+    const audioStatusText = document.getElementById("audioStatusText");
+    const audioNow = document.getElementById("audioNow");
+
+    // =========================================
+    // AUDIO FILE LOCATIONS
+    // =========================================
+
+    const AUDIO_BASE = "audio";
+
+    function getAudioPath(category, file) {
+      if (!file) {
+        throw new Error("Audio filename is missing.");
+      }
+
+      file = String(file).trim();
+
+      // Allow an event to supply a complete relative audio path.
+      if (
+        file.startsWith("audio/") ||
+        file.startsWith("./audio/") ||
+        file.startsWith("/")
+      ) {
+        return file;
+      }
+
+      // Avoid adding the extension twice.
+      if (!file.toLowerCase().endsWith(".mp3")) {
+        file += ".mp3";
+      }
+
+      let folder = "announcements";
+
+      if (category === "captain") folder = "captain";
+      if (category === "effects") folder = "effects";
+      if (category === "music") folder = "music";
+
+      return `${AUDIO_BASE}/${folder}/${file}`;
+    }
+
+    const AIRPORT_CHIME = "audio/effects/33_airport_pa_chime.mp3";
+    const CABIN_CHIME = "audio/effects/34_cabin_announcement_chime.mp3";
+    const CAPTAIN_END = "audio/effects/35_captain_radio_end.mp3";
+
+    // =========================================
+    // AUDIO STATUS
+    // =========================================
+
+    function setAudioStatus(enabled, message) {
+      audioStatusDot.classList.toggle("enabled", enabled);
+      audioStatusText.textContent = message;
+    }
+
+    function setAudioNow(message) {
+      audioNow.textContent = message || "";
+    }
+
+    // =========================================
+    // AUDIO ENABLE BUTTON
+    // A user gesture is required by browsers.
+    // =========================================
+
+    async function enableFlightAudio() {
+      enableAudioButton.disabled = true;
+      enableAudioButton.textContent = "Enabling audio...";
+
+      try {
+        const AudioContextClass =
+          window.AudioContext || window.webkitAudioContext;
+
+        if (AudioContextClass) {
+          if (!audioContext) {
+            audioContext = new AudioContextClass();
+          }
+
+          if (audioContext.state === "suspended") {
+            await audioContext.resume();
+          }
+
+          // Short, quiet test tone to verify audio output.
+          const oscillator = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+
+          oscillator.frequency.value = 660;
+          gain.gain.setValueAtTime(0.045, audioContext.currentTime);
+          gain.gain.exponentialRampToValueAtTime(
+            0.001,
+            audioContext.currentTime + 0.16
+          );
+
+          oscillator.connect(gain);
+          gain.connect(audioContext.destination);
+
+          oscillator.start();
+          oscillator.stop(audioContext.currentTime + 0.16);
+        }
+
+        // Also unlock HTML audio playback with a silent sound.
+        const silentAudio = new Audio(
+          "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="
+        );
+
+        silentAudio.volume = 0;
+
+        try {
+          await silentAudio.play();
+          silentAudio.pause();
+          silentAudio.currentTime = 0;
+        } catch (error) {
+          console.warn("Silent audio unlock was unavailable:", error);
+        }
+
+        audioEnabled = true;
+
+        enableAudioButton.textContent = "Flight Audio Enabled";
+        enableAudioButton.disabled = false;
+
+        setAudioStatus(
+          true,
+          "Audio enabled. Waiting for announcements from your flight crew."
+        );
+
+        setAudioNow("Audio system ready.");
+
+      } catch (error) {
+        console.error("Audio enable error:", error);
+
+        audioEnabled = false;
+
+        enableAudioButton.textContent = "Try Enabling Audio Again";
+        enableAudioButton.disabled = false;
+
+        setAudioStatus(
+          false,
+          "Could not enable audio. Check your device volume and try again."
+        );
+      }
+    }
+
+    enableAudioButton.addEventListener("click", enableFlightAudio);
+
+    // =========================================
+    // STOP AUDIO
+    // =========================================
+
+    function stopAudio() {
+      playbackToken++;
+
+      if (announcementAudio) {
+        announcementAudio.pause();
+        announcementAudio.currentTime = 0;
+        announcementAudio = null;
+      }
+
+      if (musicAudio) {
+        musicAudio.pause();
+        musicAudio.currentTime = 0;
+        musicAudio = null;
+      }
+
+      setAudioNow("Audio stopped.");
+    }
+
+    // =========================================
+    // PLAY ONE AUDIO FILE
+    // =========================================
+
+    function playOneFile(path, type = "announcement", token = playbackToken) {
+      return new Promise((resolve, reject) => {
+        if (!audioEnabled) {
+          reject(new Error("Passenger audio has not been enabled."));
+          return;
+        }
+
+        if (token !== playbackToken) {
+          resolve();
+          return;
+        }
+
+        const audio = new Audio(path);
+        audio.preload = "auto";
+        audio.volume = 1;
+
+        if (type === "music") {
+          audio.loop = true;
+
+          if (musicAudio) {
+            musicAudio.pause();
+            musicAudio.currentTime = 0;
+          }
+
+          musicAudio = audio;
+
+          audio.onplay = () => {
+            setAudioNow("Playing background music.");
+          };
+
+          audio.onerror = () => {
+            if (musicAudio === audio) musicAudio = null;
+            console.error("Music failed to load:", path);
+            reject(new Error("Could not load music: " + path));
+          };
+
+          audio.play().catch(error => {
+            if (musicAudio === audio) musicAudio = null;
+            reject(error);
+          });
+
+          return;
+        }
+
+        announcementAudio = audio;
+
+        audio.onended = () => {
+          if (announcementAudio === audio) {
+            announcementAudio = null;
+          }
+          resolve();
+        };
+
+        audio.onerror = () => {
+          if (announcementAudio === audio) {
+            announcementAudio = null;
+          }
+
+          console.error("Announcement failed to load:", path);
+          reject(new Error("Could not load audio: " + path));
+        };
+
+        audio.play().catch(error => {
+          if (announcementAudio === audio) {
+            announcementAudio = null;
+          }
+
+          reject(error);
+        });
+      });
+    }
+
+    // =========================================
+    // WAIT HELPER
+    // =========================================
+
+    function wait(milliseconds) {
+      return new Promise(resolve => setTimeout(resolve, milliseconds));
+    }
+
+    // =========================================
+    // PLAY ANNOUNCEMENT SEQUENCE
+    // =========================================
+
+    async function playAnnouncementEvent(category, file) {
+      if (!audioEnabled) {
+        setAudioNow("Announcement received. Enable Flight Audio to listen.");
+        return;
+      }
+
+      const token = playbackToken;
+
+      const task = async () => {
+        if (token !== playbackToken) return;
+
+        try {
+          const path = getAudioPath(category, file);
+
+          if (category === "airport") {
+            setAudioNow("Airport announcement chime.");
+
+            await playOneFile(AIRPORT_CHIME, "announcement", token);
+
+            if (token !== playbackToken) return;
+
+            await wait(2000);
+
+            if (token !== playbackToken) return;
+
+            setAudioNow("Playing airport announcement.");
+            await playOneFile(path, "announcement", token);
+          }
+
+          else if (category === "cabin") {
+            setAudioNow("Cabin announcement chime.");
+
+            await playOneFile(CABIN_CHIME, "announcement", token);
+
+            if (token !== playbackToken) return;
+
+            await wait(2000);
+
+            if (token !== playbackToken) return;
+
+            setAudioNow("Playing cabin announcement.");
+            await playOneFile(path, "announcement", token);
+          }
+
+          else if (category === "captain") {
+            setAudioNow("Playing captain announcement.");
+
+            await playOneFile(path, "announcement", token);
+
+            if (token !== playbackToken) return;
+
+            setAudioNow("Captain radio ending.");
+
+            await playOneFile(CAPTAIN_END, "announcement", token);
+          }
+
+          else if (category === "effects") {
+            setAudioNow("Playing audio effect.");
+            await playOneFile(path, "announcement", token);
+          }
+
+          else {
+            setAudioNow("Playing announcement.");
+            await playOneFile(path, "announcement", token);
+          }
+
+          if (token === playbackToken) {
+            setAudioNow("Announcement finished.");
+          }
+
+        } catch (error) {
+          console.error("Announcement playback error:", error);
+          setAudioNow("Audio error: " + error.message);
+        }
+      };
+
+      announcementQueue = announcementQueue.then(task, task);
+    }
+
+    // =========================================
+    // PLAY BACKGROUND MUSIC
+    // =========================================
+
+    async function playBackgroundMusic(file) {
+      if (!audioEnabled) {
+        setAudioNow("Music received. Enable Flight Audio to listen.");
+        return;
+      }
+
+      try {
+        const path = getAudioPath("music", file);
+
+        await playOneFile(path, "music");
+
+      } catch (error) {
+        console.error("Music playback error:", error);
+        setAudioNow("Music error: " + error.message);
+      }
+    }
+
+    // =========================================
+    // FADE BACKGROUND MUSIC
+    // =========================================
+
+    function fadeOutMusic() {
+      if (!musicAudio) return;
+
+      const audio = musicAudio;
+      const startingVolume = audio.volume;
+      const duration = 4000;
+      const steps = 40;
+      const interval = duration / steps;
+
+      let step = 0;
+
+      setAudioNow("Fading out background music.");
+
+      const timer = setInterval(() => {
+        step++;
+
+        audio.volume = Math.max(
+          0,
+          startingVolume * (1 - step / steps)
+        );
+
+        if (step >= steps) {
+          clearInterval(timer);
+          audio.pause();
+          audio.currentTime = 0;
+
+          if (musicAudio === audio) {
+            musicAudio = null;
+          }
+
+          setAudioNow("Background music stopped.");
+        }
+      }, interval);
+    }
+
+    // =========================================
+    // PROCESS FIRESTORE AUDIO EVENT
+    // =========================================
+
+    function processAudioEvent(eventData) {
+      if (!eventData || !eventData.action) return;
+
+      console.log("Passenger audio event:", eventData);
+
+      if (eventData.action === "stop") {
+        stopAudio();
+        return;
+      }
+
+      if (eventData.action === "fade") {
+        fadeOutMusic();
+        return;
+      }
+
+      if (eventData.action === "play") {
+        const category = eventData.category || "airport";
+        const file = eventData.file;
+
+        if (!file) {
+          console.warn("Audio event has no filename:", eventData);
+          return;
+        }
+
+        if (category === "music") {
+          playBackgroundMusic(file);
+        } else {
+          playAnnouncementEvent(category, file);
+        }
+      }
+    }
+
+    // =========================================
+    // LISTEN FOR PASSENGER AUDIO EVENTS
+    // =========================================
+
+    function listenForAudioEvents(token) {
+      if (unsubscribeAudio) {
+        unsubscribeAudio();
+        unsubscribeAudio = null;
+      }
+
+      audioSnapshotFirst = true;
+
+      const eventsRef = collection(
+        db,
+        "passengerAccess",
+        token,
+        "audioEvents"
+      );
+
+      unsubscribeAudio = onSnapshot(
+        eventsRef,
+
+        snapshot => {
+          // Ignore existing events when first connecting.
+          // Only play newly received events.
+          if (audioSnapshotFirst) {
+            audioSnapshotFirst = false;
+            console.log(
+              "Passenger audio listener ready. Existing events skipped."
+            );
+            return;
+          }
+
+          snapshot.docChanges().forEach(change => {
+            if (change.type !== "added") return;
+
+            processAudioEvent(change.doc.data());
+          });
+        },
+
+        error => {
+          console.error("Audio listener error:", error);
+
+          setAudioNow(
+            "Could not connect to live audio. Check your connection."
+          );
+        }
+      );
+    }
 
     // =========================================
     // FLIGHT PHASES
-    // Keep these names matching the crew app.
     // =========================================
 
     const phases = [
@@ -730,7 +1316,11 @@
     // =========================================
 
     function displayValue(value, fallback = "---") {
-      if (value === null || value === undefined || String(value).trim() === "") {
+      if (
+        value === null ||
+        value === undefined ||
+        String(value).trim() === ""
+      ) {
         return fallback;
       }
 
@@ -738,7 +1328,7 @@
     }
 
     // =========================================
-    // UPDATE FLIGHT PHASE
+    // FLIGHT TIMELINE
     // =========================================
 
     function renderTimeline(currentPhase) {
@@ -813,9 +1403,14 @@
     function connectPassenger() {
       showLoading();
 
-      if (unsubscribe) {
-        unsubscribe();
-        unsubscribe = null;
+      if (unsubscribePassenger) {
+        unsubscribePassenger();
+        unsubscribePassenger = null;
+      }
+
+      if (unsubscribeAudio) {
+        unsubscribeAudio();
+        unsubscribeAudio = null;
       }
 
       const params = new URLSearchParams(window.location.search);
@@ -829,14 +1424,18 @@
         return;
       }
 
-      const cleanToken = token.trim();
+      passengerToken = token.trim();
 
-      const passengerRef = doc(db, "passengerAccess", cleanToken);
+      const passengerRef = doc(
+        db,
+        "passengerAccess",
+        passengerToken
+      );
 
-      unsubscribe = onSnapshot(
+      unsubscribePassenger = onSnapshot(
         passengerRef,
 
-        (snapshot) => {
+        snapshot => {
           if (!snapshot.exists()) {
             showError(
               "Passenger link not found",
@@ -849,9 +1448,12 @@
 
           updatePassenger(data);
           showContent();
+
+          // Start listening for audio events.
+          listenForAudioEvents(passengerToken);
         },
 
-        (error) => {
+        error => {
           console.error("Passenger connection error:", error);
 
           showError(
@@ -871,18 +1473,22 @@
     });
 
     // =========================================
+    // CLEAN UP
+    // =========================================
+
+    window.addEventListener("beforeunload", () => {
+      if (unsubscribePassenger) unsubscribePassenger();
+      if (unsubscribeAudio) unsubscribeAudio();
+
+      stopAudio();
+    });
+
+    // =========================================
     // START
     // =========================================
 
     connectPassenger();
 
-    window.addEventListener("beforeunload", () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
-    });
-
   </script>
 </body>
 </html>
-
