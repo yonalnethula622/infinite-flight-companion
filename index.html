@@ -6,7 +6,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#091321">
 <title>Infinite Flight Companion</title>
-
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 <style>
@@ -91,28 +90,18 @@ td{font-size:13px}
 .phase{font-size:20px;color:var(--gold);font-weight:bold}
 .small{font-size:12px}
 .menuToggle{display:none}
-
-/* LIVE TRACKER */
 #trackerMap{width:100%;height:480px;background:#0b1929;border-radius:12px;border:1px solid var(--line);z-index:1}
 .tracker-map-card{padding:12px}
 .tracker-map-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-.aircraft-marker{font-size:30px;color:#f5c76b;text-shadow:0 2px 5px #000;transform-origin:center;text-align:center;width:40px;height:40px;line-height:40px}
 .tracker-coordinate{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
 .tracker-stat{min-width:0}
 #trackerStatus{font-weight:bold}
 .leaflet-container{background:#0b1929}
+.aircraft-dot{width:14px;height:14px;background:#ffd166;border:3px solid #fff;border-radius:50%;box-shadow:0 0 8px #ffd166,0 0 18px rgba(255,209,102,.8)}
 @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.quick{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:700px){.sidebar{transform:translateX(-100%);transition:.2s}.sidebar.open{transform:translateX(0)}.main{margin:0}.menuToggle{display:inline-block}.topbar{padding:0 14px}.content{padding:16px}.formgrid{grid-template-columns:1fr}.grid{gap:8px}.stat{padding:12px}.quick{grid-template-columns:1fr 1fr}#trackerMap{height:350px}}
 @media(max-width:420px){.grid{grid-template-columns:1fr 1fr}.topbar strong{font-size:13px}}
 @media print{body.printpass *{visibility:hidden!important}body.printpass #boardingPass,body.printpass #boardingPass *{visibility:visible!important}body.printpass #boardingPass{position:absolute;inset:0;width:100%;max-width:none}body.printpass #boardingPass button{display:none}}
-.aircraft-dot {
-  width: 14px;
-  height: 14px;
-  background: #ffd166;
-  border: 3px solid #ffffff;
-  border-radius: 50%;
-  box-shadow: 0 0 8px #ffd166, 0 0 18px rgba(255, 209, 102, 0.8);
-}
 </style>
 </head>
 
@@ -288,10 +277,8 @@ td{font-size:13px}
     </div></div>
    </section>
 
-   <!-- LIVE TRACKER -->
    <section class="page" id="page-tracker">
     <div class="heading"><h1>Live Flight Tracker</h1><p>Live aircraft tracking from Infinite Flight Simulator.</p></div>
-
     <div class="card">
      <div class="row">
       <div><label>Simulator connection</label><b id="trackerStatus" class="err">● Not connected</b></div>
@@ -305,7 +292,6 @@ td{font-size:13px}
      <p id="trackerCoordinates" class="tracker-coordinate">Coordinates: —</p>
      <p id="trackerUpdated" class="tracker-coordinate">Last update: —</p>
     </div>
-
     <div class="card tracker-map-card">
      <div class="tracker-map-toolbar">
       <div><h3 style="margin:0">Live Satellite Map</h3><small class="muted">Aircraft position and flight path</small></div>
@@ -313,14 +299,12 @@ td{font-size:13px}
      </div>
      <div id="trackerMap"></div>
     </div>
-
     <div class="grid" style="margin-top:15px">
      <div class="stat tracker-stat"><small>Altitude</small><b id="trackerAltitude">—</b><small>ft MSL</small></div>
      <div class="stat tracker-stat"><small>Ground Speed</small><b id="trackerSpeed">—</b><small>kt</small></div>
      <div class="stat tracker-stat"><small>Heading</small><b id="trackerHeading">—</b><small>degrees</small></div>
      <div class="stat tracker-stat"><small>Vertical Speed</small><b id="trackerVerticalSpeed">—</b><small>ft/min</small></div>
     </div>
-
     <div class="card">
      <label>Estimated flight phase</label>
      <div class="phase" id="trackerPhase">Waiting...</div>
@@ -329,7 +313,16 @@ td{font-size:13px}
    </section>
 
    <section class="page" id="page-audio">
-    <div class="heading"><h1>Audio Centre</h1><p>Your 35 MP3 files are connected using the GitHub folder paths.</p></div>
+    <div class="heading"><h1>Audio Centre</h1><p>Control announcements and music for your selected passenger flight.</p></div>
+
+    <div class="card">
+     <h3>Passenger audio synchronization</h3>
+     <label>Select the flight whose passengers should receive audio</label>
+     <select id="audioFlight"><option value="">Select a flight</option></select>
+     <p class="muted small">Audio commands are sent to passengers with a generated passenger access link for this flight.</p>
+     <p id="audioSyncStatus" class="message">Select a flight to enable passenger synchronization.</p>
+    </div>
+
     <div class="card">
      <div class="row"><div><b>Background music controls</b><p class="muted small">Music continues underneath announcements. Fade-out takes 4 seconds.</p></div><span class="pill" id="audioStatus">Ready</span></div>
      <div class="row"><button class="primary" id="playLoungeMusic">Play lounge music</button><button class="secondary" id="fadeLoungeMusic">Fade out lounge music · 4 sec</button></div>
@@ -337,6 +330,7 @@ td{font-size:13px}
      <div class="row"><button class="danger" id="stopAudio">Stop all audio</button></div>
      <p id="audioMessage" class="message"></p>
     </div>
+
     <div class="card"><h3>Announcement Quick Search</h3><p class="muted small">Type a name such as delay, turbulence, boarding or landing, then press Enter.</p><div class="audio-tools"><input id="announcementSearch" type="search" placeholder="Search announcements…" autocomplete="off"><button class="primary" id="searchPlayButton">Search & Play</button></div><div id="announcementSearchResults" class="search-results hidden"></div></div>
     <div class="card"><div class="row"><div><h3>Keyboard shortcuts</h3><p class="muted small">Shortcuts use Ctrl + Alt + key.</p></div><button class="secondary" id="saveShortcutsButton">Save shortcuts</button></div><p id="shortcutMessage" class="message"></p><div id="shortcutList"></div><p class="shortcut-help">Shortcuts are saved in this browser on this device. They are ignored while typing.</p></div>
     <div class="card"><h3>Airport PA</h3><div id="airportAudioList"></div></div>
@@ -364,7 +358,7 @@ import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut,sendPasswor
 import{getFirestore,doc,getDoc,collection,addDoc,getDocs,query,orderBy,limit,serverTimestamp,where,updateDoc,setDoc}from"https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
 
 const firebaseConfig={
- apiKey:"AIzaSyDQgKie9EHcjG81IWxez_vxPue4zfFnZbk",
+ apiKey:"AIzaSyDQkGie9EHcjG81IWxez_vxPue4zfFnZbk",
  authDomain:"infinite-flight-companion.firebaseapp.com",
  projectId:"infinite-flight-companion",
  storageBucket:"infinite-flight-companion.firebasestorage.app",
@@ -379,11 +373,7 @@ let currentUser=null,currentRole=null,flights=[],passengers=[],selectedSeat="",s
 
 /* LOCAL INFINITE FLIGHT BRIDGE */
 const BRIDGE_URL="http://127.0.0.1:8765";
-let trackerMap=null;
-let trackerMarker=null;
-let trackerPath=null;
-let trackerPollTimer=null;
-let trackerLastPosition=null;
+let trackerMap=null,trackerMarker=null,trackerPath=null,trackerPollTimer=null,trackerLastPosition=null;
 
 const path=(folder,file)=>`audio/${folder}/${file}.mp3`;
 
@@ -400,7 +390,10 @@ const shortcutStorageKey="ifc_audio_shortcuts_v1";
 const shortcutKeys=["1","2","3","4","5","6","7","8","9","0","Q","W","E","R","T","Y","U","I","O","P","A","S","D","F","G","H","J","K","L","Z","X","C","V","B"];
 let audioShortcuts=loadShortcuts();
 
-function msg(id,text,kind="muted"){const e=$(id);if(e){e.textContent=text;e.className="message "+kind}}
+function msg(id,text,kind="muted"){
+ const e=$(id);
+ if(e){e.textContent=text;e.className="message "+kind}
+}
 function safe(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function showApp(){$("loginPage").classList.add("hidden");$("app").classList.remove("hidden")}
 function showLogin(){$("app").classList.add("hidden");$("loginPage").classList.remove("hidden")}
@@ -416,6 +409,7 @@ function navigate(page){
  if(page==="checkin")populateFlightSelect("passengerFlight");
  if(page==="boarding")populateFlightSelect("boardingFlight");
  if(page==="cabin")populateFlightSelect("cabinFlight");
+ if(page==="audio")populateFlightSelect("audioFlight");
 
  if(page==="tracker"){
   populateFlightSelect("trackerFlight");
@@ -448,7 +442,7 @@ $("resetButton").addEventListener("click",async()=>{
 
 async function logout(){
  stopLiveTracker();
- stopAllAudio();
+ await stopAllAudio(false);
  await signOut(auth);
  currentUser=null;
  showLogin();
@@ -486,7 +480,7 @@ async function loadFlights(){
   const snap=await getDocs(query(collection(db,"workspaces","main","flights"),orderBy("createdAt","desc"),limit(100)));
   flights=snap.docs.map(d=>({id:d.id,...d.data()}));
   renderFlights();
-  for(const id of ["passengerFlight","boardingFlight","cabinFlight","trackerFlight"])populateFlightSelect(id);
+  for(const id of ["passengerFlight","boardingFlight","cabinFlight","trackerFlight","audioFlight"])populateFlightSelect(id);
  }catch(e){msg("flightMessage","Could not load flights: "+e.message,"err")}
 }
 
@@ -622,6 +616,8 @@ async function showPass(p){
    const bytes=crypto.getRandomValues(new Uint8Array(32));
    token=Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join("");
    await updateDoc(doc(db,"workspaces","main","passengers",p.id),{accessCode:token});
+   const index=passengers.findIndex(x=>x.id===p.id);
+   if(index>=0)passengers[index].accessCode=token;
   }
   const linkedFlight=flights.find(f=>f.id===p.flightId);
   const currentFlightPhase=linkedFlight?.phase||"Pre-flight";
@@ -675,7 +671,7 @@ function renderBoarding(){
  });
 }
 
-document.querySelectorAll("[data-board-audio]").forEach(b=>b.addEventListener("click",()=>playAnnouncement("airport",b.dataset.boardAudio)));
+document.querySelectorAll("[data-board-audio]").forEach(b=>b.addEventListener("click",()=>playAnnouncement("airport",b.dataset.boardAudio,$("boardingFlight").value)));
 
 /* CABIN EXPERIENCE */
 $("cabinFlight").addEventListener("change",()=>{
@@ -709,88 +705,50 @@ $("setPhaseButton").addEventListener("click",async()=>{
  finally{button.disabled=false}
 });
 
-document.querySelectorAll("[data-cabin-audio]").forEach(b=>b.addEventListener("click",()=>playAnnouncement("cabin",b.dataset.cabinAudio)));
-document.querySelectorAll("[data-captain-audio]").forEach(b=>b.addEventListener("click",()=>playAnnouncement("captain",b.dataset.captainAudio)));
+document.querySelectorAll("[data-cabin-audio]").forEach(b=>b.addEventListener("click",()=>playAnnouncement("cabin",b.dataset.cabinAudio,$("cabinFlight").value)));
+document.querySelectorAll("[data-captain-audio]").forEach(b=>b.addEventListener("click",()=>playAnnouncement("captain",b.dataset.captainAudio,$("cabinFlight").value)));
 
-/* =========================================================
-   LIVE INFINITE FLIGHT TRACKER
-   Python bridge: http://127.0.0.1:8765
-   ========================================================= */
-
+/* LIVE INFINITE FLIGHT TRACKER */
 function initializeTrackerMap(){
  if(trackerMap)return;
-
  if(!window.L){
   $("trackerMessage").textContent="Map library could not load. Check your internet connection.";
   return;
  }
-
  trackerMap=L.map("trackerMap",{zoomControl:true}).setView([0,0],3);
-
- L.tileLayer(
-  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-  {
-   maxZoom:19,
-   attribution:"Tiles &copy; Esri — Sources: Esri, Maxar, Earthstar Geographics, and the GIS User Community"
-  }
- ).addTo(trackerMap);
-
+ L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{
+  maxZoom:19,
+  attribution:"Tiles &copy; Esri — Sources: Esri, Maxar, Earthstar Geographics, and the GIS User Community"
+ }).addTo(trackerMap);
  trackerPath=L.polyline([],{color:"#e6b65c",weight:4,opacity:0.9}).addTo(trackerMap);
 }
 
 function getFlightPhase(data){
- const altitude=data.altitudeFt;
- const speed=data.groundSpeedKt;
- const vertical=data.verticalSpeedFpm;
-
+ const altitude=data.altitudeFt,speed=data.groundSpeedKt,vertical=data.verticalSpeedFpm;
  if(![altitude,speed,vertical].every(Number.isFinite))return "Unknown";
-
  if(speed<30&&altitude<1500)return "On Ground";
  if(speed>=30&&altitude<1500)return "Takeoff / Initial Climb";
  if(vertical>500)return "Climb";
-
- if(vertical< -500){
-  if(altitude<3000)return "Final Approach";
-  return "Descent";
- }
-
+ if(vertical< -500){if(altitude<3000)return "Final Approach";return "Descent"}
  if(altitude>10000)return "Cruise";
  return "Level Flight";
 }
 
 function updateTrackerDisplay(data){
- const lat=Number(data.latitude);
- const lon=Number(data.longitude);
-
- /*
-   Infinite Flight Connect values from your Python bridge:
-   altitude = metres
-   groundSpeed = metres per second
-   verticalSpeed = metres per second
-   heading = degrees (your Python script already converts it)
- */
-
+ const lat=Number(data.latitude),lon=Number(data.longitude);
  const altitudeMeters=Number(data.altitude);
  const speedMetersPerSecond=Number(data.groundSpeed);
  const verticalMetersPerSecond=Number(data.verticalSpeed);
  const heading=Number(data.heading);
 
- if(![lat,lon,altitudeMeters,speedMetersPerSecond,verticalMetersPerSecond,heading].every(Number.isFinite)){
-  throw new Error("Invalid telemetry received.");
- }
-
+ if(![lat,lon,altitudeMeters,speedMetersPerSecond,verticalMetersPerSecond,heading].every(Number.isFinite))throw new Error("Invalid telemetry received.");
  if(Math.abs(lat)>90||Math.abs(lon)>180)throw new Error("Invalid aircraft coordinates.");
 
  const altitudeFt=altitudeMeters*3.28084;
  const groundSpeedKt=speedMetersPerSecond*1.943844;
  const verticalSpeedFpm=verticalMetersPerSecond*196.8504;
  const normalizedHeading=(heading+360)%360;
-
- const converted={
-  altitudeFt,
-  groundSpeedKt,
-  verticalSpeedFpm
- };
+ const converted={altitudeFt,groundSpeedKt,verticalSpeedFpm};
 
  $("trackerAltitude").textContent=altitudeFt.toLocaleString(undefined,{maximumFractionDigits:0});
  $("trackerSpeed").textContent=groundSpeedKt.toFixed(1);
@@ -801,15 +759,8 @@ function updateTrackerDisplay(data){
  $("trackerUpdated").textContent="Last update: "+new Date(data.timestamp||Date.now()).toLocaleTimeString();
 
  if(!trackerMap)return;
-
  const position=[lat,lon];
-
- const planeIcon=L.divIcon({
-  className:"",
-  html: `<div class="aircraft-dot"></div>`,
-  iconSize: [16, 16],
-  iconAnchor: [8, 8]
- });
+ const planeIcon=L.divIcon({className:"",html:'<div class="aircraft-dot"></div>',iconSize:[16,16],iconAnchor:[8,8]});
 
  if(!trackerMarker){
   trackerMarker=L.marker(position,{icon:planeIcon}).addTo(trackerMap);
@@ -820,13 +771,9 @@ function updateTrackerDisplay(data){
   trackerMarker.setIcon(planeIcon);
  }
 
- if(!trackerLastPosition||
-    Math.abs(lat-trackerLastPosition[0])>0.00002||
-    Math.abs(lon-trackerLastPosition[1])>0.00002){
-
+ if(!trackerLastPosition||Math.abs(lat-trackerLastPosition[0])>0.00002||Math.abs(lon-trackerLastPosition[1])>0.00002){
   trackerPath.addLatLng(position);
   trackerLastPosition=position;
-
   const points=trackerPath.getLatLngs();
   if(points.length>2000)trackerPath.setLatLngs(points.slice(-2000));
  }
@@ -834,27 +781,17 @@ function updateTrackerDisplay(data){
 
 async function pollTracker(){
  try{
-  const response=await fetch(BRIDGE_URL+"/telemetry",{
-   method:"GET",
-   cache:"no-store"
-  });
-
+  const response=await fetch(BRIDGE_URL+"/telemetry",{method:"GET",cache:"no-store"});
   if(!response.ok)throw new Error("Bridge HTTP error: "+response.status);
-
   const data=await response.json();
-
   if(!data.connected)throw new Error("Infinite Flight is not connected.");
-
   updateTrackerDisplay(data);
-
   $("trackerStatus").textContent="● Connected";
   $("trackerStatus").className="ok";
   $("trackerMessage").textContent="Receiving live aircraft telemetry.";
-
  }catch(error){
   $("trackerStatus").textContent="● Disconnected";
   $("trackerStatus").className="err";
-
   if(error instanceof TypeError){
    $("trackerMessage").textContent="Cannot reach the local bridge. Check that if_bridge.py is running and allow local network access in Chrome if requested.";
   }else{
@@ -865,34 +802,18 @@ async function pollTracker(){
 
 function startLiveTracker(){
  if(trackerPollTimer)return;
-
  initializeTrackerMap();
-
- if(trackerMap){
-  setTimeout(()=>trackerMap.invalidateSize(),250);
- }
-
+ if(trackerMap)setTimeout(()=>trackerMap.invalidateSize(),250);
  pollTracker();
  trackerPollTimer=setInterval(pollTracker,1500);
 }
-
 function stopLiveTracker(){
- if(trackerPollTimer){
-  clearInterval(trackerPollTimer);
-  trackerPollTimer=null;
- }
+ if(trackerPollTimer){clearInterval(trackerPollTimer);trackerPollTimer=null}
 }
-
-$("trackerReconnect").addEventListener("click",()=>{
- pollTracker();
-});
-
+$("trackerReconnect").addEventListener("click",pollTracker);
 $("trackerCenterButton").addEventListener("click",()=>{
- if(trackerMap&&trackerMarker){
-  trackerMap.setView(trackerMarker.getLatLng(),10);
- }
+ if(trackerMap&&trackerMarker)trackerMap.setView(trackerMarker.getLatLng(),10);
 });
-
 window.addEventListener("beforeunload",stopLiveTracker);
 
 /* AUDIO CENTRE */
@@ -904,19 +825,11 @@ function allAudioEntries(){
  return out;
 }
 
-function allAudioEntriesSeed(){
- const out=[];
- for(const category of ["airport","cabin","captain","music","effects"]){
-  for(const [file,label] of files[category])out.push({category,file,label});
- }
- return out;
-}
-
 function loadShortcuts(){
  let saved={};
  try{saved=JSON.parse(localStorage.getItem(shortcutStorageKey)||"{}")}catch(e){}
  const result={};
- allAudioEntriesSeed().forEach((entry,i)=>{
+ allAudioEntries().forEach((entry,i)=>{
   result[entry.file]=saved[entry.file]||("Ctrl+Alt+"+shortcutKeys[i]);
  });
  return result;
@@ -933,9 +846,64 @@ function storageFolder(category){
  if(category==="airport"||category==="cabin")return "announcements";
  return category;
 }
+function audioPath(category,file){return path(storageFolder(category),file)}
 
-function audioPath(category,file){
- return path(storageFolder(category),file);
+function selectedAudioFlightId(){
+ return $("audioFlight")?.value||"";
+}
+
+/*
+  SEND AUDIO EVENTS TO PASSENGERS
+  Each passenger must have an accessCode created by opening their
+  passenger QR / View Pass at least once.
+*/
+async function sendAudioEventToPassengers(flightId,eventData){
+ if(!flightId){
+  msg("audioSyncStatus","No flight selected. Audio will play on this device only.","err");
+  return {sent:0,skipped:0};
+ }
+
+ try{
+  const snap=await getDocs(query(
+   collection(db,"workspaces","main","passengers"),
+   where("flightId","==",flightId)
+  ));
+
+  let sent=0,skipped=0;
+  const tasks=[];
+
+  snap.docs.forEach(passengerDoc=>{
+   const passenger=passengerDoc.data();
+   if(!passenger.accessCode){
+    skipped++;
+    return;
+   }
+
+   tasks.push(addDoc(
+    collection(db,"passengerAccess",passenger.accessCode,"audioEvents"),
+    {
+     ...eventData,
+     createdAt:serverTimestamp()
+    }
+   ));
+  });
+
+  await Promise.all(tasks);
+
+  const flight=flights.find(f=>f.id===flightId);
+  const flightName=flight?.flightNumber||"selected flight";
+
+  msg(
+   "audioSyncStatus",
+   `Sent to ${sent=snap.size-skipped} passenger(s) on ${flightName}. ${skipped?skipped+" passenger(s) need their QR link generated.":""}`,
+   skipped?"err":"ok"
+  );
+
+  return {sent,skipped};
+ }catch(error){
+  msg("audioSyncStatus","Passenger audio sync failed: "+error.message,"err");
+  return {sent:0,skipped:0,error};
+ }
 }
 
 function stopMusic(){
@@ -944,10 +912,19 @@ function stopMusic(){
  currentMusicFile="";
 }
 
-function fadeOutMusic(file){
- if(!musicAudio||musicAudio.paused){msg("audioMessage","No background music is currently playing.","err");return}
- if(currentMusicFile!==file){msg("audioMessage","That music track is not currently playing.","err");return}
+async function fadeOutMusic(file,flightId=selectedAudioFlightId()){
+ if(!musicAudio||musicAudio.paused){
+  msg("audioMessage","No background music is currently playing.","err");
+  return;
+ }
+ if(currentMusicFile!==file){
+  msg("audioMessage","That music track is not currently playing.","err");
+  return;
+ }
+
  if(musicFadeTimer){clearInterval(musicFadeTimer);musicFadeTimer=null}
+
+ await sendAudioEventToPassengers(flightId,{action:"fade",category:"music",file});
 
  const audio=musicAudio;
  const startingVolume=audio.volume;
@@ -965,7 +942,6 @@ function fadeOutMusic(file){
    musicFadeTimer=null;
    audio.pause();
    audio.currentTime=0;
-
    if(musicAudio===audio){musicAudio=null;currentMusicFile=""}
    $("audioStatus").textContent="Music faded out";
    msg("audioMessage","Music has faded out and stopped.","ok");
@@ -982,22 +958,32 @@ function stopActiveAnnouncement(){
  }
 }
 
-function stopAllAudio(){
+async function stopAllAudio(publish=true,flightId=selectedAudioFlightId()){
  playToken++;
  if(audioDelayTimer){clearTimeout(audioDelayTimer);audioDelayTimer=null}
  stopActiveAnnouncement();
  stopMusic();
+
+ if(publish){
+  await sendAudioEventToPassengers(flightId,{action:"stop"});
+ }
+
  $("audioStatus").textContent="Stopped";
  msg("audioMessage","All audio stopped.","ok");
 }
 
-function playMusic(file){
+async function playMusic(file,flightId=selectedAudioFlightId()){
  stopMusic();
  currentMusicFile=file;
+
  const audio=new Audio(path("music",file));
  musicAudio=audio;
  audio.loop=true;
  audio.volume=.45;
+
+ if(flightId){
+  await sendAudioEventToPassengers(flightId,{action:"play",category:"music",file});
+ }
 
  audio.play().then(()=>{
   if(musicAudio===audio){
@@ -1044,7 +1030,7 @@ function playOne(category,file){
  });
 }
 
-async function playAnnouncement(category,file){
+async function playAnnouncement(category,file,flightId=selectedAudioFlightId()){
  const entry=findFile(file);
  if(!entry)return;
 
@@ -1053,6 +1039,14 @@ async function playAnnouncement(category,file){
  stopActiveAnnouncement();
 
  const actualCategory=entry.category;
+
+ if(flightId){
+  await sendAudioEventToPassengers(flightId,{
+   action:"play",
+   category:actualCategory,
+   file:file
+  });
+ }
 
  try{
   if(actualCategory==="airport"||actualCategory==="cabin"){
@@ -1069,7 +1063,7 @@ async function playAnnouncement(category,file){
   }else if(actualCategory==="effects"){
    await playOne("effects",file);
   }else if(actualCategory==="music"){
-   if(token===playToken)playMusic(file);
+   if(token===playToken)await playMusic(file,flightId);
    return;
   }
 
@@ -1110,7 +1104,6 @@ function renderShortcutList(){
 
 function saveShortcuts(){
  const next={};
-
  document.querySelectorAll("[data-shortcut-file]").forEach(input=>{
   const file=input.dataset.shortcutFile;
   const value=input.value.trim();
@@ -1119,7 +1112,6 @@ function saveShortcuts(){
 
  const values=Object.values(next).map(normalizeShortcut);
  const duplicates=values.filter((v,i)=>values.indexOf(v)!==i);
-
  if(duplicates.length){
   msg("shortcutMessage","Each audio needs a unique shortcut. Please remove duplicate shortcuts.","err");
   return;
@@ -1133,7 +1125,6 @@ function saveShortcuts(){
 function normalizeShortcut(value){
  return String(value||"").toLowerCase().replace(/\s+/g,"").replace(/control/g,"ctrl").replace(/\+/g,"+");
 }
-
 function eventShortcut(e){
  const parts=[];
  if(e.ctrlKey)parts.push("Ctrl");
@@ -1143,11 +1134,9 @@ function eventShortcut(e){
  parts.push(e.key.toUpperCase());
  return normalizeShortcut(parts.join("+"));
 }
-
 function isTypingTarget(target){
  return target instanceof HTMLElement&&(target.isContentEditable||["INPUT","TEXTAREA","SELECT"].includes(target.tagName));
 }
-
 function playByShortcut(e){
  if(isTypingTarget(e.target))return;
  const pressed=eventShortcut(e);
@@ -1170,7 +1159,6 @@ function searchAnnouncements(){
  const matches=allAudioEntries().filter(entry=>
   [entry.label,entry.file,entry.category].join(" ").toLowerCase().replace(/_/g," ").includes(q)
  );
-
  const announcementMatches=matches.filter(x=>["airport","cabin","captain"].includes(x.category));
 
  if(!announcementMatches.length){
@@ -1180,7 +1168,6 @@ function searchAnnouncements(){
  }
 
  $("announcementSearchResults").classList.remove("hidden");
-
  $("announcementSearchResults").innerHTML=announcementMatches.map(x=>`
   <div class="search-result">
    <span><b>${safe(x.label)}</b><br><small class="muted">${safe(x.category)} · ${safe(x.file)}.mp3</small></span>
@@ -1207,6 +1194,15 @@ renderAudioList("captainAudioList","captain");
 renderAudioList("effectsAudioList","effects");
 renderShortcutList();
 
+$("audioFlight").addEventListener("change",()=>{
+ const flight=flights.find(f=>f.id===$("audioFlight").value);
+ if(flight){
+  msg("audioSyncStatus","Ready to send audio to passengers on "+flight.flightNumber+".","ok");
+ }else{
+  msg("audioSyncStatus","Select a flight to enable passenger synchronization.","muted");
+ }
+});
+
 $("saveShortcutsButton").addEventListener("click",saveShortcuts);
 $("announcementSearch").addEventListener("keydown",e=>{
  if(e.key==="Enter"){e.preventDefault();searchAnnouncements()}
@@ -1218,8 +1214,8 @@ $("playLoungeMusic").addEventListener("click",()=>playMusic("32_lounge_music"));
 $("fadeLoungeMusic").addEventListener("click",()=>fadeOutMusic("32_lounge_music"));
 $("playBoardingMusic").addEventListener("click",()=>playMusic("31_boarding_music"));
 $("fadeBoardingMusic").addEventListener("click",()=>fadeOutMusic("31_boarding_music"));
-$("stopAudio").addEventListener("click",stopAllAudio);
-$("settingsStopAudio").addEventListener("click",stopAllAudio);
+$("stopAudio").addEventListener("click",()=>stopAllAudio(true));
+$("settingsStopAudio").addEventListener("click",()=>stopAllAudio(true));
 
 </script>
 </body>
