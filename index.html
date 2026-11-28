@@ -105,6 +105,14 @@ td{font-size:13px}
 @media(max-width:700px){.sidebar{transform:translateX(-100%);transition:.2s}.sidebar.open{transform:translateX(0)}.main{margin:0}.menuToggle{display:inline-block}.topbar{padding:0 14px}.content{padding:16px}.formgrid{grid-template-columns:1fr}.grid{gap:8px}.stat{padding:12px}.quick{grid-template-columns:1fr 1fr}#trackerMap{height:350px}}
 @media(max-width:420px){.grid{grid-template-columns:1fr 1fr}.topbar strong{font-size:13px}}
 @media print{body.printpass *{visibility:hidden!important}body.printpass #boardingPass,body.printpass #boardingPass *{visibility:visible!important}body.printpass #boardingPass{position:absolute;inset:0;width:100%;max-width:none}body.printpass #boardingPass button{display:none}}
+.aircraft-dot {
+  width: 14px;
+  height: 14px;
+  background: #ffd166;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #ffd166, 0 0 18px rgba(255, 209, 102, 0.8);
+}
 </style>
 </head>
 
@@ -798,9 +806,9 @@ function updateTrackerDisplay(data){
 
  const planeIcon=L.divIcon({
   className:"",
-  html:`<div class="aircraft-marker" style="transform:rotate(${normalizedHeading}deg)">✈</div>`,
-  iconSize:[40,40],
-  iconAnchor:[20,20]
+  html: `<div class="aircraft-dot"></div>`,
+  iconSize: [16, 16],
+  iconAnchor: [8, 8]
  });
 
  if(!trackerMarker){
