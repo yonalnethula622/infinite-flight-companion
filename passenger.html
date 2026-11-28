@@ -2,675 +2,887 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#091321">
-<title>Infinite Flight Passenger</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080d18">
+  <title>Infinite Flight Passenger</title>
 
-<style>
-:root{
-  --bg:#07111f;
-  --panel:#101f32;
-  --panel2:#162940;
-  --line:#293e56;
-  --gold:#d9ad58;
-  --text:#f4f6fa;
-  --muted:#9aabc0;
-  --green:#45c58a;
-  --red:#ed7777;
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:
-    radial-gradient(ellipse at top,#172c43 0%,#07111f 55%);
-  color:var(--text);
-  font-family:Arial,sans-serif;
-  min-height:100vh;
-}
-.container{
-  width:min(1050px,100%);
-  margin:auto;
-  padding:24px 18px 50px;
-}
-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding:12px 0 25px;
-}
-.brand{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-.brand-icon{
-  width:45px;
-  height:45px;
-  display:grid;
-  place-items:center;
-  background:linear-gradient(145deg,#f1d18b,#b88637);
-  color:#101827;
-  border-radius:13px;
-  font-size:24px;
-}
-.brand-name{
-  font-size:15px;
-  font-weight:800;
-  letter-spacing:1px;
-}
-.brand-sub{
-  font-size:10px;
-  color:var(--muted);
-  letter-spacing:2px;
-  margin-top:5px;
-}
-.live{
-  border:1px solid #28654e;
-  background:#102d27;
-  color:#73d9a8;
-  border-radius:30px;
-  padding:8px 12px;
-  font-size:11px;
-  white-space:nowrap;
-}
-.hero{
-  padding:32px 25px;
-  border:1px solid #4b4535;
-  border-radius:20px;
-  background:
-    linear-gradient(120deg,rgba(217,173,88,.17),transparent 65%),
-    var(--panel);
-  margin-bottom:18px;
-  position:relative;
-  overflow:hidden;
-}
-.hero:after{
-  content:"✈";
-  position:absolute;
-  right:25px;
-  top:15px;
-  font-size:100px;
-  opacity:.06;
-  transform:rotate(-12deg);
-}
-.eyebrow{
-  color:var(--gold);
-  font-size:11px;
-  font-weight:bold;
-  letter-spacing:2px;
-}
-.hero h1{
-  font-size:clamp(27px,5vw,43px);
-  margin:12px 0 8px;
-}
-.hero p{
-  color:var(--muted);
-  margin:0;
-  line-height:1.6;
-}
-.card{
-  background:rgba(16,31,50,.94);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:21px;
-  margin-bottom:16px;
-}
-.card-title{
-  font-size:15px;
-  margin:0 0 17px;
-}
-.flight-route{
-  display:grid;
-  grid-template-columns:1fr auto 1fr;
-  align-items:center;
-  gap:12px;
-  padding:12px 0 22px;
-}
-.airport:last-child{text-align:right}
-.airport-code{
-  font-size:clamp(30px,7vw,48px);
-  font-weight:800;
-  letter-spacing:1px;
-}
-.airport-label{
-  color:var(--muted);
-  font-size:11px;
-  margin-top:6px;
-}
-.route-line{
-  display:flex;
-  align-items:center;
-  gap:7px;
-  color:var(--gold);
-}
-.route-line span{
-  width:45px;
-  height:1px;
-  background:var(--gold);
-}
-.route-line b{font-size:19px}
-.details-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-}
-.detail{
-  background:#0a1929;
-  border:1px solid var(--line);
-  border-radius:11px;
-  padding:13px;
-  min-width:0;
-}
-.detail small{
-  display:block;
-  color:var(--muted);
-  font-size:10px;
-  text-transform:uppercase;
-  letter-spacing:1px;
-}
-.detail strong{
-  display:block;
-  font-size:15px;
-  margin-top:8px;
-  overflow-wrap:anywhere;
-}
-.boarding-pass{
-  background:#f5f5ef;
-  color:#142438;
-  border-radius:15px;
-  overflow:hidden;
-}
-.pass-top{
-  background:#13263d;
-  color:#fff;
-  padding:17px 20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-}
-.pass-top small{
-  color:#d5b978;
-  font-size:10px;
-  letter-spacing:1.5px;
-}
-.pass-body{padding:21px}
-.pass-label{
-  color:#68778a;
-  font-size:10px;
-  letter-spacing:1.3px;
-  margin-bottom:7px;
-}
-.pass-name{
-  font-size:23px;
-  font-weight:800;
-  margin-bottom:22px;
-  overflow-wrap:anywhere;
-}
-.pass-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-}
-.pass-value{
-  font-size:16px;
-  font-weight:800;
-  overflow-wrap:anywhere;
-}
-.pass-seat{
-  color:#a4772d;
-  font-size:26px;
-}
-.pass-footer{
-  border-top:1px dashed #aab2bc;
-  margin-top:20px;
-  padding-top:15px;
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  color:#657489;
-  font-size:11px;
-}
-.phase-banner{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  background:#0b1b2c;
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:17px;
-}
-.phase-name{
-  color:var(--gold);
-  font-size:20px;
-  font-weight:bold;
-  margin-top:6px;
-}
-.phase-indicator{
-  width:12px;
-  height:12px;
-  background:var(--green);
-  border-radius:50%;
-  box-shadow:0 0 12px rgba(69,197,138,.6);
-}
-.progress{
-  height:6px;
-  background:#26394e;
-  border-radius:10px;
-  margin:19px 0 9px;
-  overflow:hidden;
-}
-.progress-bar{
-  height:100%;
-  width:0;
-  background:linear-gradient(90deg,#b88637,#f0d18a);
-  border-radius:10px;
-  transition:width .5s ease;
-}
-.progress-labels{
-  display:flex;
-  justify-content:space-between;
-  gap:8px;
-  color:var(--muted);
-  font-size:10px;
-}
-.status-message{
-  text-align:center;
-  padding:35px 20px;
-  color:var(--muted);
-}
-.status-icon{
-  font-size:38px;
-  margin-bottom:12px;
-}
-.status-message h2{
-  color:var(--text);
-  font-size:20px;
-}
-.status-message p{
-  line-height:1.6;
-}
-footer{
-  text-align:center;
-  color:#72849b;
-  font-size:11px;
-  padding:20px 0 5px;
-  line-height:1.8;
-}
-.hidden{display:none!important}
-#connectionText{
-  font-size:11px;
-  color:var(--muted);
-  margin-top:12px;
-}
-@media(max-width:520px){
-  .container{padding:15px 12px 35px}
-  .hero{padding:25px 18px}
-  .card{padding:16px}
-  .details-grid{grid-template-columns:repeat(2,1fr)}
-  .pass-grid{grid-template-columns:repeat(2,1fr)}
-  .airport-code{font-size:34px}
-  .route-line span{width:22px}
-  .brand-name{font-size:13px}
-}
-</style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #080d18;
+      --panel: #111a2b;
+      --panel2: #152137;
+      --border: rgba(255,255,255,.09);
+      --text: #f4f7ff;
+      --muted: #8d9ab1;
+      --blue: #63a8ff;
+      --cyan: #52d6e8;
+      --green: #55d6a0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 50% -15%, rgba(55,112,190,.20), transparent 55%),
+        var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .container {
+      width: min(100% - 36px, 900px);
+      margin: auto;
+      padding: 28px 0 50px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 38px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 43px;
+      height: 43px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #347fe0, #35c6d5);
+      box-shadow: 0 7px 25px rgba(57,145,235,.22);
+      font-size: 21px;
+    }
+
+    .brand-name {
+      font-family: Manrope, sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -.4px;
+    }
+
+    .brand-sub {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 2px;
+    }
+
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 12px var(--green);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      50% { opacity: .4; }
+    }
+
+    .welcome {
+      margin-bottom: 25px;
+    }
+
+    .eyebrow {
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-family: Manrope, sans-serif;
+      font-size: clamp(27px, 5vw, 39px);
+      line-height: 1.2;
+      letter-spacing: -1.4px;
+    }
+
+    .welcome p {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 9px;
+      line-height: 1.6;
+    }
+
+    .card {
+      background: linear-gradient(145deg, rgba(23,36,58,.98), rgba(15,24,40,.98));
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 25px;
+      margin-bottom: 18px;
+      box-shadow: 0 18px 55px rgba(0,0,0,.16);
+    }
+
+    .flight-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    .flight-label {
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .flight-number {
+      font-family: Manrope, sans-serif;
+      font-size: 23px;
+      font-weight: 800;
+      margin-top: 5px;
+    }
+
+    .phase-badge {
+      border: 1px solid rgba(82,214,232,.25);
+      background: rgba(82,214,232,.09);
+      color: var(--cyan);
+      border-radius: 30px;
+      padding: 9px 13px;
+      font-size: 11px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .route {
+      display: grid;
+      grid-template-columns: 1fr minmax(90px, 1.1fr) 1fr;
+      align-items: center;
+      gap: 10px;
+      margin: 5px 0 30px;
+    }
+
+    .airport:last-child {
+      text-align: right;
+    }
+
+    .airport-code {
+      font-family: Manrope, sans-serif;
+      font-size: clamp(27px, 7vw, 39px);
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      overflow-wrap: anywhere;
+    }
+
+    .airport-caption {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 5px;
+      overflow-wrap: anywhere;
+    }
+
+    .route-middle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--blue);
+    }
+
+    .route-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #4d9bfa, transparent);
+      flex: 1;
+    }
+
+    .plane {
+      font-size: 20px;
+      transform: rotate(90deg);
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+    }
+
+    .detail-label {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 7px;
+    }
+
+    .detail-value {
+      font-size: 14px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .section-heading {
+      font-family: Manrope, sans-serif;
+      font-size: 17px;
+      font-weight: 800;
+      margin-bottom: 7px;
+    }
+
+    .section-description {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      margin-bottom: 22px;
+    }
+
+    .current-phase {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 17px;
+      background: rgba(76,151,241,.09);
+      border: 1px solid rgba(76,151,241,.17);
+      border-radius: 15px;
+      margin-bottom: 23px;
+    }
+
+    .phase-icon {
+      width: 43px;
+      height: 43px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      border-radius: 13px;
+      background: rgba(76,151,241,.15);
+      font-size: 20px;
+    }
+
+    .current-label {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .current-name {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .timeline {
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      padding: 5px 2px 12px;
+      scrollbar-width: thin;
+      scrollbar-color: #344b6b transparent;
+    }
+
+    .timeline-step {
+      position: relative;
+      flex: 0 0 105px;
+      text-align: center;
+    }
+
+    .timeline-step:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      height: 2px;
+      background: #29374d;
+      width: calc(100% - 18px);
+      left: calc(50% + 9px);
+      top: 9px;
+    }
+
+    .timeline-step.completed:not(:last-child)::after {
+      background: var(--blue);
+    }
+
+    .timeline-dot {
+      width: 19px;
+      height: 19px;
+      border: 2px solid #34435b;
+      border-radius: 50%;
+      background: var(--panel);
+      margin: 0 auto 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .timeline-step.completed .timeline-dot {
+      background: var(--blue);
+      border-color: var(--blue);
+    }
+
+    .timeline-step.active .timeline-dot {
+      border: 5px solid var(--blue);
+      background: #fff;
+      box-shadow: 0 0 15px rgba(99,168,255,.55);
+    }
+
+    .timeline-text {
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.4;
+      padding: 0 4px;
+    }
+
+    .timeline-step.active .timeline-text {
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    .timeline-step.completed .timeline-text {
+      color: #b4c6e1;
+    }
+
+    .passenger-card {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      flex-shrink: 0;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #2e6fba, #36b9c9);
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .passenger-label {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+    }
+
+    .passenger-name {
+      font-size: 16px;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .footer {
+      color: #64728a;
+      font-size: 11px;
+      text-align: center;
+      line-height: 1.8;
+      padding: 22px 10px 0;
+    }
+
+    .state-screen {
+      min-height: 65vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 25px;
+    }
+
+    .state-icon {
+      width: 65px;
+      height: 65px;
+      border-radius: 20px;
+      display: grid;
+      place-items: center;
+      background: var(--panel2);
+      font-size: 27px;
+      margin-bottom: 20px;
+    }
+
+    .state-screen h2 {
+      font-family: Manrope, sans-serif;
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .state-screen p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+      max-width: 330px;
+    }
+
+    .loader {
+      width: 33px;
+      height: 33px;
+      border: 3px solid #263b59;
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .retry-button {
+      margin-top: 20px;
+      background: #347fe0;
+      border: 0;
+      color: white;
+      border-radius: 10px;
+      padding: 12px 20px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 520px) {
+      .container {
+        width: min(100% - 24px, 900px);
+        padding-top: 20px;
+      }
+
+      header {
+        margin-bottom: 30px;
+      }
+
+      .card {
+        padding: 19px;
+        border-radius: 18px;
+      }
+
+      .details {
+        gap: 7px;
+      }
+
+      .detail-value {
+        font-size: 12px;
+      }
+
+      .phase-badge {
+        padding: 8px 10px;
+        max-width: 125px;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <div class="container">
 
-<div class="container">
-
-<header>
-  <div class="brand">
-    <div class="brand-icon">✈</div>
-    <div>
-      <div class="brand-name">INFINITE FLIGHT</div>
-      <div class="brand-sub">PASSENGER EXPERIENCE</div>
-    </div>
-  </div>
-  <div class="live" id="liveStatus">● CONNECTING</div>
-</header>
-
-<div id="loadingScreen" class="card status-message">
-  <div class="status-icon">✈</div>
-  <h2>Preparing your journey</h2>
-  <p>Connecting to your passenger boarding pass...</p>
-</div>
-
-<div id="errorScreen" class="card status-message hidden">
-  <div class="status-icon">!</div>
-  <h2 id="errorTitle">Unable to load boarding pass</h2>
-  <p id="errorText">Please check your passenger link.</p>
-</div>
-
-<main id="passengerApp" class="hidden">
-
-  <section class="hero">
-    <div class="eyebrow">YOUR JOURNEY STARTS HERE</div>
-    <h1>Welcome aboard.</h1>
-    <p id="welcomeText">Your personal flight experience is ready.</p>
-  </section>
-
-  <section class="card">
-    <h2 class="card-title">Your flight</h2>
-
-    <div class="flight-route">
-      <div class="airport">
-        <div class="airport-code" id="departure">---</div>
-        <div class="airport-label">DEPARTURE</div>
-      </div>
-
-      <div class="route-line">
-        <span></span>
-        <b>✈</b>
-        <span></span>
-      </div>
-
-      <div class="airport">
-        <div class="airport-code" id="destination">---</div>
-        <div class="airport-label">DESTINATION</div>
-      </div>
-    </div>
-
-    <div class="details-grid">
-      <div class="detail">
-        <small>Airline</small>
-        <strong id="airline">---</strong>
-      </div>
-      <div class="detail">
-        <small>Flight number</small>
-        <strong id="flightNumber">---</strong>
-      </div>
-      <div class="detail">
-        <small>Seat</small>
-        <strong id="seat">---</strong>
-      </div>
-    </div>
-  </section>
-
-  <section class="card">
-    <h2 class="card-title">Your digital boarding pass</h2>
-
-    <div class="boarding-pass">
-      <div class="pass-top">
+    <header>
+      <div class="brand">
+        <div class="brand-icon">✈</div>
         <div>
-          <b>✈ INFINITE FLIGHT</b><br>
-          <small>PASSENGER BOARDING PASS</small>
-        </div>
-        <b>IFC</b>
-      </div>
-
-      <div class="pass-body">
-        <div class="pass-label">PASSENGER NAME</div>
-        <div class="pass-name" id="passName">---</div>
-
-        <div class="pass-grid">
-          <div>
-            <div class="pass-label">FLIGHT</div>
-            <div class="pass-value" id="passFlight">---</div>
-          </div>
-          <div>
-            <div class="pass-label">ROUTE</div>
-            <div class="pass-value" id="passRoute">---</div>
-          </div>
-          <div>
-            <div class="pass-label">SEAT</div>
-            <div class="pass-value pass-seat" id="passSeat">---</div>
-          </div>
-        </div>
-
-        <div class="pass-footer">
-          <span>INFINITE FLIGHT COMPANION</span>
-          <span>DIGITAL BOARDING PASS</span>
+          <div class="brand-name">INFINITE FLIGHT</div>
+          <div class="brand-sub">PASSENGER EXPERIENCE</div>
         </div>
       </div>
-    </div>
-  </section>
 
-  <section class="card">
-    <h2 class="card-title">Live flight experience</h2>
-
-    <div class="phase-banner">
-      <div>
-        <div class="pass-label">CURRENT FLIGHT PHASE</div>
-        <div class="phase-name" id="currentPhase">Pre-flight</div>
+      <div class="live-indicator">
+        <span class="live-dot"></span>
+        LIVE UPDATES
       </div>
-      <div class="phase-indicator"></div>
-    </div>
+    </header>
 
-    <div class="progress">
-      <div class="progress-bar" id="phaseProgress"></div>
-    </div>
+    <!-- LOADING SCREEN -->
+    <section id="loadingScreen" class="state-screen">
+      <div class="loader"></div>
+      <h2>Connecting to your flight</h2>
+      <p>Please wait while we load your passenger information.</p>
+    </section>
 
-    <div class="progress-labels">
-      <span>Pre-flight</span>
-      <span>Takeoff</span>
-      <span>Cruise</span>
-      <span>Landing</span>
-    </div>
+    <!-- ERROR SCREEN -->
+    <section id="errorScreen" class="state-screen" hidden>
+      <div class="state-icon">!</div>
+      <h2 id="errorTitle">Unable to open passenger page</h2>
+      <p id="errorMessage">
+        Please check your link and try again.
+      </p>
+      <button class="retry-button" id="retryButton">
+        Try again
+      </button>
+    </section>
 
-    <p id="phaseDescription" class="muted" style="line-height:1.6;margin-top:17px">
-      Your flight updates will appear here.
-    </p>
+    <!-- PASSENGER CONTENT -->
+    <main id="passengerContent" hidden>
 
-    <p id="connectionText">Waiting for live updates...</p>
-  </section>
+      <section class="welcome">
+        <div class="eyebrow">YOUR FLIGHT EXPERIENCE</div>
+        <h1>Welcome, <span id="welcomeName">Passenger</span></h1>
+        <p>Your flight information and live cabin experience updates are available here.</p>
+      </section>
 
-  <section class="card">
-    <h2 class="card-title">Your journey details</h2>
+      <!-- FLIGHT INFORMATION -->
+      <section class="card">
 
-    <div class="details-grid">
-      <div class="detail">
-        <small>Passenger</small>
-        <strong id="detailName">---</strong>
+        <div class="flight-top">
+          <div>
+            <div class="flight-label">FLIGHT DETAILS</div>
+            <div class="flight-number" id="flightNumber">Flight</div>
+          </div>
+          <div class="phase-badge" id="phaseBadge">Pre-flight</div>
+        </div>
+
+        <div class="route">
+          <div class="airport">
+            <div class="airport-code" id="departure">---</div>
+            <div class="airport-caption">DEPARTURE</div>
+          </div>
+
+          <div class="route-middle">
+            <div class="route-line"></div>
+            <div class="plane">✈</div>
+            <div class="route-line"></div>
+          </div>
+
+          <div class="airport">
+            <div class="airport-code" id="destination">---</div>
+            <div class="airport-caption">DESTINATION</div>
+          </div>
+        </div>
+
+        <div class="details">
+          <div>
+            <div class="detail-label">AIRLINE</div>
+            <div class="detail-value" id="airline">---</div>
+          </div>
+          <div>
+            <div class="detail-label">SEAT</div>
+            <div class="detail-value" id="seat">---</div>
+          </div>
+          <div>
+            <div class="detail-label">FLIGHT</div>
+            <div class="detail-value" id="flightNumberSmall">---</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- LIVE FLIGHT PHASE -->
+      <section class="card">
+        <div class="section-heading">Flight progress</div>
+        <div class="section-description">
+          Follow the latest flight phase shared by your cabin crew.
+        </div>
+
+        <div class="current-phase">
+          <div class="phase-icon" id="phaseIcon">✈</div>
+          <div>
+            <div class="current-label">CURRENT FLIGHT PHASE</div>
+            <div class="current-name" id="currentPhase">Pre-flight</div>
+          </div>
+        </div>
+
+        <div class="timeline" id="timeline"></div>
+      </section>
+
+      <!-- PASSENGER INFORMATION -->
+      <section class="card">
+        <div class="passenger-card">
+          <div class="avatar" id="avatar">P</div>
+          <div>
+            <div class="passenger-label">PASSENGER</div>
+            <div class="passenger-name" id="passengerName">Passenger</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="footer">
+        INFINITE FLIGHT PASSENGER<br>
+        Your journey. Your experience.<br>
+        Flight information is provided by your flight crew.
       </div>
-      <div class="detail">
-        <small>Seat number</small>
-        <strong id="detailSeat">---</strong>
-      </div>
-      <div class="detail">
-        <small>Flight status</small>
-        <strong id="detailStatus">Waiting</strong>
-      </div>
-    </div>
-  </section>
 
-</main>
+    </main>
+  </div>
 
-<footer>
-  <b>INFINITE FLIGHT PASSENGER</b><br>
-  Your personal journey companion.<br>
-  Powered by Infinite Flight Companion.
-</footer>
+  <script type="module">
+    // =========================================
+    // FIREBASE IMPORTS
+    // =========================================
 
-</div>
+    import { initializeApp }
+      from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
 
-<script type="module">
-import {
-  initializeApp
-} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+    import {
+      getFirestore,
+      doc,
+      onSnapshot
+    } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
 
-import {
-  getFirestore,
-  doc,
-  onSnapshot
-} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
+    // =========================================
+    // YOUR EXISTING FIREBASE CONFIGURATION
+    // =========================================
 
-/* FIREBASE CONFIGURATION */
-const firebaseConfig = {
-  apiKey: "AIzaSyDQgKie9EHcjG81IWxez_vxPue4zfFnZbk",
-  authDomain: "infinite-flight-companion.firebaseapp.com",
-  projectId: "infinite-flight-companion",
-  storageBucket: "infinite-flight-companion.firebasestorage.app",
-  messagingSenderId: "208265827432",
-  appId: "1:208265827432:web:72d8d6d7e2ce38ec1017dd"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyDQgKie9EHcjG81IWxez_vxPue4zfFnZbk",
+      authDomain: "infinite-flight-companion.firebaseapp.com",
+      projectId: "infinite-flight-companion",
+      storageBucket: "infinite-flight-companion.firebasestorage.app",
+      messagingSenderId: "208265827432",
+      appId: "1:208265827432:web:72d8d6d7e2ce38ec1017dd"
+    };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-const $ = id => document.getElementById(id);
+    // =========================================
+    // PAGE ELEMENTS
+    // =========================================
 
-/* FLIGHT PHASE INFORMATION */
-const phases = [
-  {
-    name:"Pre-flight",
-    progress:0,
-    description:"Your journey is being prepared. Please get comfortable and wait for boarding."
-  },
-  {
-    name:"Boarding",
-    progress:8,
-    description:"Boarding is in progress. Please follow the crew's instructions."
-  },
-  {
-    name:"Doors closed",
-    progress:15,
-    description:"The aircraft doors are closed. Cabin preparations are underway."
-  },
-  {
-    name:"After takeoff",
-    progress:25,
-    description:"The aircraft has departed. Welcome aboard!"
-  },
-  {
-    name:"Climb",
-    progress:35,
-    description:"The aircraft is climbing towards its cruising altitude."
-  },
-  {
-    name:"Cruise",
-    progress:65,
-    description:"We are cruising towards your destination. Sit back and enjoy your journey."
-  },
-  {
-    name:"Turbulence",
-    progress:70,
-    description:"Some turbulence is expected. Please follow the crew's instructions."
-  },
-  {
-    name:"Descent",
-    progress:82,
-    description:"We are beginning our descent towards the destination."
-  },
-  {
-    name:"Final approach",
-    progress:92,
-    description:"We are approaching the destination. Please prepare for landing."
-  },
-  {
-    name:"After landing",
-    progress:97,
-    description:"We have landed. Please remain seated until the aircraft has stopped."
-  },
-  {
-    name:"Disembarkation",
-    progress:100,
-    description:"Thank you for flying with us. We hope you enjoyed your journey!"
-  }
-];
+    const loadingScreen = document.getElementById("loadingScreen");
+    const errorScreen = document.getElementById("errorScreen");
+    const passengerContent = document.getElementById("passengerContent");
 
-function showError(title,message){
-  $("loadingScreen").classList.add("hidden");
-  $("passengerApp").classList.add("hidden");
-  $("errorScreen").classList.remove("hidden");
-  $("errorTitle").textContent=title;
-  $("errorText").textContent=message;
-  $("liveStatus").textContent="● UNAVAILABLE";
-  $("liveStatus").style.color="#ed7777";
-}
+    let unsubscribe = null;
 
-function displayPassenger(data){
-  $("welcomeText").textContent=
-    "Welcome aboard, "+(data.name||"Passenger")+". Your personal flight experience is ready.";
+    // =========================================
+    // FLIGHT PHASES
+    // Keep these names matching the crew app.
+    // =========================================
 
-  $("departure").textContent=data.departure||"---";
-  $("destination").textContent=data.destination||"---";
-  $("airline").textContent=data.airline||"---";
-  $("flightNumber").textContent=data.flightNumber||"---";
-  $("seat").textContent=data.seat||"---";
+    const phases = [
+      "Pre-flight",
+      "Boarding",
+      "Doors closed",
+      "After takeoff",
+      "Climb",
+      "Cruise",
+      "Turbulence",
+      "Descent",
+      "Final approach",
+      "After landing",
+      "Disembarkation"
+    ];
 
-  $("passName").textContent=data.name||"Passenger";
-  $("passFlight").textContent=data.flightNumber||"---";
-  $("passRoute").textContent=
-    (data.departure||"---")+" → "+(data.destination||"---");
-  $("passSeat").textContent=data.seat||"---";
+    function phaseSymbol(phase) {
+      const symbols = {
+        "Pre-flight": "✈",
+        "Boarding": "🚶",
+        "Doors closed": "🔒",
+        "After takeoff": "🛫",
+        "Climb": "↗",
+        "Cruise": "☁",
+        "Turbulence": "〰",
+        "Descent": "↘",
+        "Final approach": "🛬",
+        "After landing": "🛬",
+        "Disembarkation": "🚶"
+      };
 
-  $("detailName").textContent=data.name||"---";
-  $("detailSeat").textContent=data.seat||"---";
-  $("detailStatus").textContent=data.status||"Waiting";
-
-  updatePhase(data.phase||"Pre-flight");
-}
-
-function updatePhase(phaseName){
-  const phase=phases.find(p=>p.name===phaseName);
-
-  $("currentPhase").textContent=phaseName;
-
-  if(phase){
-    $("phaseProgress").style.width=phase.progress+"%";
-    $("phaseDescription").textContent=phase.description;
-  }else{
-    $("phaseProgress").style.width="0%";
-    $("phaseDescription").textContent=
-      "Your crew has updated the flight phase to "+phaseName+".";
-  }
-}
-
-/* GET PASSENGER TOKEN FROM QR URL */
-const params=new URLSearchParams(window.location.search);
-const accessCode=params.get("code");
-
-if(!accessCode){
-  showError(
-    "Passenger link missing",
-    "This link does not contain a passenger access code. Please scan the QR code on your boarding pass."
-  );
-}else if(!/^[a-f0-9]{64}$/i.test(accessCode)){
-  showError(
-    "Invalid passenger link",
-    "The passenger access code does not appear to be valid. Please scan your boarding pass QR code again."
-  );
-}else{
-  const passengerRef=doc(db,"passengerAccess",accessCode);
-
-  onSnapshot(passengerRef,snapshot=>{
-    if(!snapshot.exists()){
-      showError(
-        "Boarding pass not found",
-        "This passenger link may have expired or is no longer available. Please contact your crew."
-      );
-      return;
+      return symbols[phase] || "✈";
     }
 
-    const data=snapshot.data();
+    // =========================================
+    // SCREEN MANAGEMENT
+    // =========================================
 
-    $("loadingScreen").classList.add("hidden");
-    $("errorScreen").classList.add("hidden");
-    $("passengerApp").classList.remove("hidden");
+    function showLoading() {
+      loadingScreen.hidden = false;
+      errorScreen.hidden = true;
+      passengerContent.hidden = true;
+    }
 
-    $("liveStatus").textContent="● LIVE CONNECTED";
-    $("liveStatus").style.color="#73d9a8";
+    function showError(title, message) {
+      loadingScreen.hidden = true;
+      passengerContent.hidden = true;
+      errorScreen.hidden = false;
 
-    displayPassenger(data);
+      document.getElementById("errorTitle").textContent = title;
+      document.getElementById("errorMessage").textContent = message;
+    }
 
-    $("connectionText").textContent=
-      "Live connection active · Updated "+new Date().toLocaleTimeString();
+    function showContent() {
+      loadingScreen.hidden = true;
+      errorScreen.hidden = true;
+      passengerContent.hidden = false;
+    }
 
-  },error=>{
-    console.error("Passenger connection error:",error);
+    // =========================================
+    // SAFE DISPLAY HELPERS
+    // =========================================
 
-    showError(
-      "Connection unavailable",
-      "The passenger app could not read your boarding pass. Please check your internet connection or contact the crew."
-    );
-  });
-}
-</script>
+    function displayValue(value, fallback = "---") {
+      if (value === null || value === undefined || String(value).trim() === "") {
+        return fallback;
+      }
 
+      return String(value);
+    }
+
+    // =========================================
+    // UPDATE FLIGHT PHASE
+    // =========================================
+
+    function renderTimeline(currentPhase) {
+      const timeline = document.getElementById("timeline");
+      timeline.replaceChildren();
+
+      const currentIndex = phases.indexOf(currentPhase);
+
+      phases.forEach((phase, index) => {
+        const step = document.createElement("div");
+        step.className = "timeline-step";
+
+        if (currentIndex >= 0 && index < currentIndex) {
+          step.classList.add("completed");
+        }
+
+        if (index === currentIndex) {
+          step.classList.add("active");
+        }
+
+        const dot = document.createElement("div");
+        dot.className = "timeline-dot";
+
+        const label = document.createElement("div");
+        label.className = "timeline-text";
+        label.textContent = phase;
+
+        step.append(dot, label);
+        timeline.appendChild(step);
+      });
+    }
+
+    // =========================================
+    // DISPLAY PASSENGER DATA
+    // =========================================
+
+    function updatePassenger(data) {
+      const name = displayValue(data.name, "Passenger");
+      const flightNumber = displayValue(data.flightNumber, "Flight");
+      const airline = displayValue(data.airline);
+      const seat = displayValue(data.seat);
+      const departure = displayValue(data.departure);
+      const destination = displayValue(data.destination);
+      const phase = displayValue(data.phase, "Pre-flight");
+
+      document.getElementById("welcomeName").textContent = name;
+      document.getElementById("passengerName").textContent = name;
+
+      document.getElementById("flightNumber").textContent = flightNumber;
+      document.getElementById("flightNumberSmall").textContent = flightNumber;
+
+      document.getElementById("airline").textContent = airline;
+      document.getElementById("seat").textContent = seat;
+
+      document.getElementById("departure").textContent = departure;
+      document.getElementById("destination").textContent = destination;
+
+      document.getElementById("phaseBadge").textContent = phase;
+      document.getElementById("currentPhase").textContent = phase;
+      document.getElementById("phaseIcon").textContent = phaseSymbol(phase);
+
+      const firstLetter = name.trim().charAt(0).toUpperCase() || "P";
+      document.getElementById("avatar").textContent = firstLetter;
+
+      renderTimeline(phase);
+    }
+
+    // =========================================
+    // CONNECT TO PASSENGER ACCESS DOCUMENT
+    // =========================================
+
+    function connectPassenger() {
+      showLoading();
+
+      if (unsubscribe) {
+        unsubscribe();
+        unsubscribe = null;
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("code");
+
+      if (!token || !token.trim()) {
+        showError(
+          "Passenger link missing",
+          "This page needs the personal passenger link provided by your flight crew."
+        );
+        return;
+      }
+
+      const cleanToken = token.trim();
+
+      const passengerRef = doc(db, "passengerAccess", cleanToken);
+
+      unsubscribe = onSnapshot(
+        passengerRef,
+
+        (snapshot) => {
+          if (!snapshot.exists()) {
+            showError(
+              "Passenger link not found",
+              "This passenger link may be invalid or no longer available. Please contact your flight crew."
+            );
+            return;
+          }
+
+          const data = snapshot.data();
+
+          updatePassenger(data);
+          showContent();
+        },
+
+        (error) => {
+          console.error("Passenger connection error:", error);
+
+          showError(
+            "Connection problem",
+            "We could not load your passenger information. Please check your internet connection or try again later."
+          );
+        }
+      );
+    }
+
+    // =========================================
+    // RETRY BUTTON
+    // =========================================
+
+    document.getElementById("retryButton").addEventListener("click", () => {
+      connectPassenger();
+    });
+
+    // =========================================
+    // START
+    // =========================================
+
+    connectPassenger();
+
+    window.addEventListener("beforeunload", () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    });
+
+  </script>
 </body>
 </html>
+
